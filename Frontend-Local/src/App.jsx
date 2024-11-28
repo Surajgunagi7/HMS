@@ -1,4 +1,3 @@
-import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { 
   Home, 
@@ -7,13 +6,8 @@ import {
   ReceptionistLogin, 
   AdminDashboard, 
   DoctorDashboard 
-} from "./pages"; // Adjust imports if needed
+} from "./pages";
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
-  const isAuthenticated = !!localStorage.getItem("authToken"); // Check if token exists
-  return isAuthenticated ? children : <Navigate to="/login" />;
-};
 
 function App() {
   return (
@@ -28,22 +22,8 @@ function App() {
         <Route path="/receptionist-login" element={<ReceptionistLogin />} />
 
         {/* Protected Dashboard Pages */}
-        <Route
-          path="/admin-dashboard"
-          element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/doctor-dashboard"
-          element={
-            <ProtectedRoute>
-              <DoctorDashboard />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/admin-dashboard"element={ <AdminDashboard /> } />
+        <Route path="/doctor-dashboard"element={ <DoctorDashboard /> } />
 
         {/* Redirect all unknown routes to home page or login */}
         <Route path="*" element={<Navigate to="/" />} />

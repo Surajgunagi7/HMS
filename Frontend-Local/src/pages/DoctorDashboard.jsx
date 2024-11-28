@@ -1,8 +1,5 @@
 import React, { useState } from "react";
-import Appointments from "./Appointments";
-import Prescriptions from "./Prescriptions";
-import DoctorProfile from "./DoctorProfile";
-import MedicalHistory from "./MedicalHistory";
+import {Appointments, Prescriptions, DoctorProfile, MedicalHistory} from "../components";
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState("appointments"); // Default tab
