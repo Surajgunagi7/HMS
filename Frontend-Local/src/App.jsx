@@ -1,12 +1,19 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { 
-  Home,
+  Home, 
   AdminLogin, 
   DoctorLogin, 
-  ReceptionistLogin,
-  AdminDashboard
-} from './pages'; 
+  ReceptionistLogin, 
+  AdminDashboard, 
+  DoctorDashboard 
+} from "./pages"; // Adjust imports if needed
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = !!localStorage.getItem("authToken"); // Check if token exists
+  return isAuthenticated ? children : <Navigate to="/login" />;
+};
 
 function App() {
   return (
@@ -20,8 +27,26 @@ function App() {
         <Route path="/doctor-login" element={<DoctorLogin />} />
         <Route path="/receptionist-login" element={<ReceptionistLogin />} />
 
-        {/* Dashboard Pages */}
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        {/* Protected Dashboard Pages */}
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctor-dashboard"
+          element={
+            <ProtectedRoute>
+              <DoctorDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Redirect all unknown routes to home page or login */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>
   );
