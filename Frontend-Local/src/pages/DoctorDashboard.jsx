@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {Appointments, Prescriptions, DoctorProfile, MedicalHistory} from "../components";
+import { Appointments, Prescriptions, DoctorProfile } from "../components";
 
 const DoctorDashboard = () => {
   const [activeTab, setActiveTab] = useState("appointments"); // Default tab
@@ -11,11 +11,13 @@ const DoctorDashboard = () => {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-8 relative">
       <h1 className="text-3xl font-bold mb-4">Doctor Dashboard</h1>
+      
+      {/* Logout Button */}
       <button
         onClick={handleLogout}
-        className="mb-4 bg-red-500 text-white px-4 py-2 rounded"
+        className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded"
       >
         Logout
       </button>
@@ -24,7 +26,7 @@ const DoctorDashboard = () => {
       <div className="flex mb-6">
         <button
           onClick={() => setActiveTab("profile")}
-          className={`px-4 py-2 rounded ${
+          className={`px-4 py-2 rounded mr-3 ${
             activeTab === "profile" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
         >
@@ -33,9 +35,7 @@ const DoctorDashboard = () => {
         <button
           onClick={() => setActiveTab("appointments")}
           className={`px-4 py-2 mr-2 rounded ${
-            activeTab === "appointments"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200"
+            activeTab === "appointments" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
         >
           Appointments
@@ -43,22 +43,10 @@ const DoctorDashboard = () => {
         <button
           onClick={() => setActiveTab("prescriptions")}
           className={`px-4 py-2 rounded ${
-            activeTab === "prescriptions"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200"
+            activeTab === "prescriptions" ? "bg-blue-500 text-white" : "bg-gray-200"
           }`}
         >
           Prescriptions
-        </button>
-        <button
-          onClick={() => setActiveTab("medicalHistory")}
-          className={`px-4 py-2 rounded ${
-            activeTab === "medicalHistory"
-              ? "bg-blue-500 text-white"
-              : "bg-gray-200"
-          }`}
-        >
-          Medical History
         </button>
       </div>
 
@@ -67,7 +55,6 @@ const DoctorDashboard = () => {
         {activeTab === "appointments" && <Appointments />}
         {activeTab === "prescriptions" && <Prescriptions />}
         {activeTab === "profile" && <DoctorProfile />}
-        {activeTab === "medicalHistory" && <MedicalHistory />}
       </div>
     </div>
   );

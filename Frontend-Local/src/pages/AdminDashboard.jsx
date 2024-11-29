@@ -24,7 +24,7 @@ function AdminDashboard() {
         <ul className="space-y-6 flex-1">
           <li>
             <button
-              onClick={() => navigate('/manage-doctors')}
+              onClick={() => navigate('/admin-dashboard/manage-doctors')}
               className="w-full text-left px-4 py-2 text-lg hover:bg-teal-700 rounded-lg"
             >
               Manage Doctors
@@ -32,7 +32,7 @@ function AdminDashboard() {
           </li>
           <li>
             <button
-              onClick={() => navigate('/reports')}
+              onClick={() => navigate('/admin-dashboard/reports')}
               className="w-full text-left px-4 py-2 text-lg hover:bg-teal-700 rounded-lg"
             >
               Reports
@@ -40,7 +40,7 @@ function AdminDashboard() {
           </li>
           <li>
             <button
-              onClick={() => navigate('/manage-admins')}
+              onClick={() => navigate('/admin-dashboard/manage-admins')}
               className="w-full text-left px-4 py-2 text-lg hover:bg-teal-700 rounded-lg"
             >
               Manage Admins
@@ -48,7 +48,7 @@ function AdminDashboard() {
           </li>
           <li>
             <button
-              onClick={() => navigate('/manage-receptionists')}
+              onClick={() => navigate('/admin-dashboard/manage-receptionists')}
               className="w-full text-left px-4 py-2 text-lg hover:bg-teal-700 rounded-lg"
             >
               Manage Receptionists

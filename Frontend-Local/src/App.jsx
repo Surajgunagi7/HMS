@@ -5,9 +5,13 @@ import {
   DoctorLogin, 
   ReceptionistLogin, 
   AdminDashboard, 
-  DoctorDashboard 
+  DoctorDashboard, 
+  ManageDoc,
+  ManageAdmin,
+  ManageReceptionist,
+  Records,
+  ReceptionistDashboard,
 } from "./pages";
-
 
 function App() {
   return (
@@ -22,8 +26,15 @@ function App() {
         <Route path="/receptionist-login" element={<ReceptionistLogin />} />
 
         {/* Protected Dashboard Pages */}
-        <Route path="/admin-dashboard"element={ <AdminDashboard /> } />
-        <Route path="/doctor-dashboard"element={ <DoctorDashboard /> } />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+        <Route path="/receptionist-dashboard" element={<ReceptionistDashboard />} />
+
+        {/* Manage Doctors Page (Under Admin) */}
+        <Route path="/admin-dashboard/manage-doctors" element={<ManageDoc />} />
+        <Route path="/admin-dashboard/manage-admins" element={<ManageAdmin />} />
+        <Route path="/admin-dashboard/manage-receptionists" element={<ManageReceptionist />} />
+        <Route path="/admin-dashboard/Reports" element={<Records />} />
 
         {/* Redirect all unknown routes to home page or login */}
         <Route path="*" element={<Navigate to="/" />} />
