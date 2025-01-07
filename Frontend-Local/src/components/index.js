@@ -2,19 +2,20 @@ import LoginComponent from './LoginComponent.jsx'
 import Appointments from './DoctorComponents/Appointments.jsx'
 import DoctorProfile from './DoctorComponents/DoctorProfile.jsx'
 import Prescriptions from './DoctorComponents/Prescriptions.jsx'
-import AddDoctor from './ManageDoctor/AddDoctor.jsx'
-import UpdateDoctor from './ManageDoctor/UpdateDoctor.jsx'
-import RemoveDoctor from './ManageDoctor/RemoveDoctor.jsx'
-import AddAdmin from './ManageAdmin/AddAdmin.jsx'
-import RemoveAdmin from './ManageAdmin/RemoveAdmin.jsx'
-import UpdateAdmin from './ManageAdmin/UpdateAdmin.jsx'
-import AddReceptionist from './ManageReceptionist/AddReceptionist.jsx'
-import UpdateReceptionist from './ManageReceptionist/UpdateReceptionist.jsx'
-import RemoveReceptionist from './ManageReceptionist/RemoveReceptionist.jsx'
+import AddDoctor from './AdminComponent/ManageDoctor/AddDoctor.jsx'
+import UpdateDoctor from './AdminComponent/ManageDoctor/UpdateDoctor.jsx'
+import RemoveDoctor from './AdminComponent/ManageDoctor/RemoveDoctor.jsx'
+import AddAdmin from './AdminComponent/ManageAdmin/AddAdmin.jsx'
+import RemoveAdmin from './AdminComponent/ManageAdmin/RemoveAdmin.jsx'
+import UpdateAdmin from './AdminComponent/ManageAdmin/UpdateAdmin.jsx'
+import AddReceptionist from './AdminComponent/ManageReceptionist/AddReceptionist.jsx'
+import UpdateReceptionist from './AdminComponent/ManageReceptionist/UpdateReceptionist.jsx'
+import RemoveReceptionist from './AdminComponent/ManageReceptionist/RemoveReceptionist.jsx'
 import ReceptionistAppointment from './ReceptionistComponents/ReceptionistAppointment.jsx'
 import SearchPatient from './ReceptionistComponents/SearchPatient.jsx'
 import CreateAppointment from './ReceptionistComponents/createAppointment.jsx'
 import RequestedCalls from './ReceptionistComponents/RequestedCalls.jsx'
+import StatCard from './AdminComponent/StatCard.jsx'
 export {
     LoginComponent,
     Appointments,
@@ -32,5 +33,6 @@ export {
     ReceptionistAppointment,
     SearchPatient,
     CreateAppointment,
-    RequestedCalls
+    RequestedCalls,
+    StatCard
 } 

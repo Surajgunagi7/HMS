@@ -1,79 +1,93 @@
-import { useState } from 'react';
+import React from 'react';
+import { UserCircle, Lock, Building2 } from 'lucide-react';
 
-function LoginForm({ role, onSubmit }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
-  // Define dynamic styles based on role
-  const roleColors = {
+const LoginForm = ({ role, onSubmit }) => {
+  const roleStyles = {
     Doctor: {
-      bgColor: 'bg-purple-600',
-      hoverColor: 'hover:bg-purple-700',
-      focusColor: 'focus:ring-purple-500',
-      ringColor: 'focus:ring-purple-500',
+      iconColor: 'text-cyan-600',
+      buttonBg: 'bg-cyan-600 hover:bg-cyan-700',
+      ringColor: 'focus:ring-cyan-500'
     },
     Receptionist: {
-      bgColor: 'bg-pink-500',
-      hoverColor: 'hover:bg-pink-600',
-      focusColor: 'focus:ring-pink-500',
-      ringColor: 'focus:ring-pink-500',
+      iconColor: 'text-emerald-600',
+      buttonBg: 'bg-emerald-600 hover:bg-emerald-700',
+      ringColor: 'focus:ring-emerald-500'
     },
     Admin: {
-      bgColor: 'bg-teal-600',
-      hoverColor: 'hover:bg-teal-700',
-      focusColor: 'focus:ring-teal-500',
-      ringColor: 'focus:ring-teal-500',
-    },
+      iconColor: 'text-blue-600',
+      buttonBg: 'bg-blue-600 hover:bg-blue-700',
+      ringColor: 'focus:ring-blue-500'
+    }
   };
 
-  const colors = roleColors[role] || roleColors.Admin; // Default to Admin if no match
+  const styles = roleStyles[role] || roleStyles.Admin;
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(username, password); // Pass the values to the parent
+    const formData = {
+      username: e.target.username.value,
+      password: e.target.password.value
+    };
+    onSubmit(formData);
   };
 
   return (
-    <div className={`w-full max-w-md mx-auto bg-white shadow-lg rounded-lg p-8`}>
-      <h1 className="text-3xl font-semibold text-center mb-6 text-gray-700">
-        {role} Login
-      </h1>
+    <div className="w-96 shadow-xl backdrop-blur-md bg-white/20 rounded-3xl p-8 relative">
+      {/* Decorative circles */}
+      <div className="absolute -top-8 -left-8 w-16 h-16 bg-white/20 rounded-full backdrop-blur-sm"/>
+      <div className="absolute -bottom-8 -right-8 w-16 h-16 bg-white/20 rounded-full backdrop-blur-sm"/>
+      
+      <div className="flex flex-col items-center mb-8 relative">
+        <div className={`p-4 rounded-full bg-white/50 backdrop-blur-md shadow-lg mb-4`}>
+          <Building2 className={`w-8 h-8 ${styles.iconColor}`} />
+        </div>
+        <h1 className="text-2xl font-bold text-gray-800">{role} Login</h1>
+      </div>
+
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-600 py-2" htmlFor="username">
-            Username
-          </label>
+        <div className="relative group">
+          <UserCircle className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${styles.iconColor}`} />
           <input
             type="text"
             id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            name="username"
+            className={`w-full pl-10 pr-3 py-3 bg-white/50 backdrop-blur-sm border-0
+              rounded-lg focus:ring-2 ${styles.ringColor} focus:border-transparent
+              transition-all duration-300 placeholder-gray-500`}
+            placeholder="Username"
             required
-            className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-offset-2"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-600 py-2" htmlFor="password">
-            Password
-          </label>
+
+        <div className="relative group">
+          <Lock className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${styles.iconColor}`} />
           <input
             type="password"
             id="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            name="password"
+            className={`w-full pl-10 pr-3 py-3 bg-white/50 backdrop-blur-sm border-0
+              rounded-lg focus:ring-2 ${styles.ringColor} focus:border-transparent
+              transition-all duration-300 placeholder-gray-500`}
+            placeholder="Password"
             required
-            className="w-full px-4 py-2 border rounded-md shadow-sm focus:ring-2 focus:ring-offset-2"
           />
         </div>
+
         <button
           type="submit"
-          className={`w-full py-3 ${colors.bgColor} text-white rounded-lg shadow-lg ${colors.hoverColor} ${colors.focusColor} focus:outline-none transition duration-300`}
+          className={`w-full py-3 ${styles.buttonBg} text-white rounded-lg 
+            shadow-lg hover:shadow-xl transform hover:-translate-y-0.5
+            transition-all duration-300 backdrop-blur-sm`}
         >
-          {role} Login
+          Login as {role}
         </button>
       </form>
+
+      <p className="mt-8 text-center text-sm text-gray-700">
+        Need help? Contact system administrator
+      </p>
     </div>
   );
-}
+};
 
 export default LoginForm;

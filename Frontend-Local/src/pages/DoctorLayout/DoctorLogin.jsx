@@ -1,0 +1,36 @@
+import { useNavigate } from 'react-router-dom';
+import { LoginComponent } from '../../components/index.js';
+import { useDispatch } from 'react-redux';
+import { authService } from '../../services/authService.js';
+import { login as doctorLogin } from '../../store/authSlice.js';
+
+function DoctorLogin() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch()
+
+  const handleSubmit = async (data) => {
+      try {
+        const { username, password } = data; 
+        
+        const response = await authService.login(username, password, 'doctor');
+        const { token } = response;
+        localStorage.setItem('token', token);
+        
+        dispatch(doctorLogin({username, role: 'doctor', token}));
+  
+        navigate('/doctor-dashboard');
+      } catch (error) {
+        console.error('Login failed:', error.message);
+        alert('Invalid credentials. Please try again.');
+      }
+  };
+  
+
+  return (
+    <div className="h-screen w-full bg-gradient-to-r from-cyan-50 via-cyan-100 to-cyan-200 flex justify-center items-center">
+      <LoginComponent role="Doctor" onSubmit={handleSubmit} />
+    </div>
+  );
+}
+
+export default DoctorLogin;

@@ -1,14 +1,16 @@
 import Home from './Home.jsx'
-import AdminLogin from './AdminLogin.jsx'
-import DoctorLogin from './DoctorLogin.jsx'
-import ReceptionistLogin from './ReceptionistLogin.jsx'
-import AdminDashboard from './AdminDashboard.jsx'
-import DoctorDashboard from './DoctorDashboard.jsx'
-import ManageDoc from './ManageDoc.jsx'
-import ManageAdmin from './ManageAdmin.jsx'
-import ManageReceptionist  from './ManageReceptionist.jsx'
-import Records from './Reports.jsx'
-import ReceptionistDashboard from './ReceptionistDashboard.jsx'
+import AdminLogin from './AdminLayout/AdminLogin.jsx'
+import DoctorLogin from './DoctorLayout/DoctorLogin.jsx'
+import ReceptionistLogin from './ReceptionistLayout/ReceptionistLogin.jsx'
+import AdminDashboard from './AdminLayout/AdminDashboard.jsx'
+import DoctorDashboard from './DoctorLayout/DoctorDashboard.jsx'
+import ManageDoc from './AdminLayout/ManageDoc.jsx'
+import ManageAdmin from './AdminLayout/ManageAdmin.jsx'
+import ManageReceptionist  from './AdminLayout/ManageReceptionist.jsx'
+import ReceptionistDashboard from './ReceptionistLayout/ReceptionistDashboard.jsx'
+import Sales from './AdminLayout/Sales.jsx'
+import ActivityRecords from './AdminLayout/ActivityRecords.jsx'
+
 export {
     Home,
     AdminLogin,
@@ -19,6 +21,7 @@ export {
     ManageDoc,
     ManageAdmin,
     ManageReceptionist,
-    Records,
-    ReceptionistDashboard
+    ReceptionistDashboard,
+    Sales,
+    ActivityRecords
 }

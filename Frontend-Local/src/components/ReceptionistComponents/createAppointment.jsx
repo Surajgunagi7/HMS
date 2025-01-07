@@ -1,116 +1,157 @@
-import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Calendar, Clock, User, Mail, Phone, Stethoscope, FileText } from 'lucide-react';
 
 const CreateAppointment = () => {
-  const [patientName, setPatientName] = useState("");
-  const [age, setAge] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [doctorName, setDoctorName] = useState("");
-  const [reason, setReason] = useState("");
-  const [appointmentDate, setAppointmentDate] = useState("");
-  const [appointmentTime, setAppointmentTime] = useState("");
-
-  const handleCreateAppointment = () => {
-    // Validate if all fields are filled
-    if (!patientName || !age || !email || !phone || !doctorName || !reason || !appointmentDate || !appointmentTime) {
-      alert("Please fill all the fields.");
-      return;
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    defaultValues: {
+      patientName: "",
+      age: "",
+      email: "",
+      phone: "",
+      doctorName: "",
+      reason: "",
+      appointmentDate: "",
+      appointmentTime: ""
     }
+  });
 
-    // Normally, you'd send this data to your backend or store it in your state
-    alert("Appointment Created Successfully!");
-
-    // Reset the form
-    setPatientName("");
-    setAge("");
-    setEmail("");
-    setPhone("");
-    setDoctorName("");
-    setReason("");
-    setAppointmentDate("");
-    setAppointmentTime("");
+  const onSubmit = (data) => {
+    console.log("Form submitted:", data);
   };
 
-  return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h2 className="text-3xl font-semibold text-center text-blue-600 mb-8">Create Appointment</h2>
+  const InputField = ({ icon: Icon, ...props }) => (
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Icon className="h-5 w-5 text-gray-400" />
+      </div>
+      <input
+        {...register(props.name, {
+          required: "This field is required",
+          ...(props.name === "email" && {
+            pattern: {
+              value: /\S+@\S+\.\S+/,
+              message: "Please enter a valid email"
+            }
+          }),
+          ...(props.name === "age" && {
+            min: { value: 0, message: "Age must be positive" },
+            max: { value: 150, message: "Please enter a valid age" }
+          })
+        })}
+        {...props}
+        className={`w-full pl-10 pr-4 py-3 bg-gray-50 border ${
+          errors[props.name] ? 'border-red-300' : 'border-gray-200'
+        } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+      />
+      {errors[props.name] && (
+        <p className="mt-1 text-sm text-red-500">{errors[props.name].message}</p>
+      )}
+    </div>
+  );
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Patient Information */}
-        <div className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">Patient Details</h3>
-          <input
-            type="text"
-            placeholder="Patient Name"
-            value={patientName}
-            onChange={(e) => setPatientName(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md"
-          />
-          <input
-            type="number"
-            placeholder="Age"
-            value={age}
-            onChange={(e) => setAge(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md"
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md"
-          />
-          <input
-            type="tel"
-            placeholder="Phone Number"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md"
-          />
+  return (
+    <div className="max-w-4xl mx-auto p-8">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="border-b border-gray-200 bg-gray-50 px-8 py-4">
+          <h2 className="text-xl font-semibold text-gray-900">Create New Appointment</h2>
+          <p className="mt-1 text-sm text-gray-500">Fill in the information below to schedule a new appointment</p>
         </div>
 
-        {/* Appointment Details */}
-        <div className="flex flex-col gap-4">
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">Appointment Details</h3>
-          <input
-            type="text"
-            placeholder="Doctor's Name"
-            value={doctorName}
-            onChange={(e) => setDoctorName(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md"
-          />
-          <textarea
-            placeholder="Reason for Checkup"
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            className="p-3 border border-gray-300 rounded-md"
-          />
-          <div className="flex space-x-4">
-            <input
-              type="date"
-              value={appointmentDate}
-              onChange={(e) => setAppointmentDate(e.target.value)}
-              className="p-3 border border-gray-300 rounded-md w-full"
-            />
-            <input
-              type="time"
-              value={appointmentTime}
-              onChange={(e) => setAppointmentTime(e.target.value)}
-              className="p-3 border border-gray-300 rounded-md w-full"
-            />
+        <div className="p-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Patient Information</h3>
+                <div className="space-y-4">
+                  <InputField
+                    icon={User}
+                    type="text"
+                    name="patientName"
+                    placeholder="Patient Name"
+                  />
+                  <InputField
+                    icon={User}
+                    type="number"
+                    name="age"
+                    placeholder="Age"
+                  />
+                  <InputField
+                    icon={Mail}
+                    type="email"
+                    name="email"
+                    placeholder="Email Address"
+                  />
+                  <InputField
+                    icon={Phone}
+                    type="tel"
+                    name="phone"
+                    placeholder="Phone Number"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Appointment Details</h3>
+                <div className="space-y-4">
+                  <InputField
+                    icon={Stethoscope}
+                    type="text"
+                    name="doctorName"
+                    placeholder="Doctor's Name"
+                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <FileText className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <textarea
+                      {...register("reason", { required: "This field is required" })}
+                      placeholder="Reason for Visit"
+                      rows="3"
+                      className={`w-full pl-10 pr-4 py-3 bg-gray-50 border ${
+                        errors.reason ? 'border-red-300' : 'border-gray-200'
+                      } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                    />
+                    {errors.reason && (
+                      <p className="mt-1 text-sm text-red-500">{errors.reason.message}</p>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <InputField
+                      icon={Calendar}
+                      type="date"
+                      name="appointmentDate"
+                    />
+                    <InputField
+                      icon={Clock}
+                      type="time"
+                      name="appointmentTime"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Submit Button */}
-      <div className="text-center mt-6">
-        <button
-          onClick={handleCreateAppointment}
-          className="bg-blue-600 text-white px-6 py-3 rounded-full hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
-        >
-          Create Appointment
-        </button>
-      </div>
+        <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
+          <div className="flex justify-end">
+            <button
+              type="button"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 mr-4"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              Create Appointment
+            </button>
+          </div>
+        </div>
+      </form>
     </div>
   );
 };
