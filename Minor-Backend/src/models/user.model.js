@@ -1,0 +1,90 @@
+import mongoose, {Schema} from "mongoose";
+import bcrypt from 'bcryptjs'
+import validator from 'validator'
+import jwt from 'jsonwebtoken'
+
+const userSchema = new Schema(
+    {
+        name: {
+            type: String,
+            required: true,
+        },
+        email: {
+            type: String,
+            required: true,
+            unique: true,
+            lowercase: true,
+            validate: [validator.isEmail, "Invalid email"],
+        },
+        password: {
+            type: String,
+            required: true,
+        },
+        role: {
+            type: String, 
+            enum: ["admin", "doctor", "receptionist"],
+            required: true,
+        },
+        loginId: {
+            type: String,
+            unique: true,
+        },
+        about: {        
+            type: new Schema({
+                experience: {
+                    type: String
+                },
+                education: {
+                    type: String
+                },
+                description: {
+                    type: String
+                },
+            },{_id: false})
+        },
+        specialization: {
+            type: String, 
+        },
+        phone: {
+            type: String
+        },
+        refreshToken: {
+            type: String
+        },
+    },{timestamps: true});
+
+userSchema.pre("save", async function (next) {
+    if(!this.isModified("password")) return next();
+
+    this.password = await bcrypt.hash(this.password, 12)
+    next()
+})
+
+userSchema.methods.isPasswordCorrect = async function (password) {
+    return await bcrypt.compare(password, this.password)
+}
+
+userSchema.methods.generateAccessToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+            role: this.role
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
+userSchema.methods.generateRefreshToken = function () {
+    return jwt.sign(
+        {
+            _id: this._id,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    )
+}
+export const User = mongoose.model("User",userSchema); 
