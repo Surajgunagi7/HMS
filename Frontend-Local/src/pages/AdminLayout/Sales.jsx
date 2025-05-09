@@ -110,7 +110,7 @@ const Sales = () => {
         {/* Header Section */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
           <div className="flex items-center gap-4">
-            <h1 className="text-3xl font-bold text-gray-900">Hospital Sales Overview</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Revenue Overview</h1>
           </div>
           <div className="flex gap-4">
             <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors">

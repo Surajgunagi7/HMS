@@ -11,15 +11,21 @@ function AdminLogin() {
 
   const handleSubmit = async (data) => {
     try {
-      const { username, password } = data; 
+      const { loginId, password } = data; 
       
-      const response = await authService.login(username, password, 'admin');
-      const { token } = response;
-      localStorage.setItem('token', token);
+      const response = await authService.login(loginId, password, 'admin');
       
-      dispatch(adminLogin({username,role: 'admin', token}));
+      const token  = response?.data?.accessToken;
+      const role =  response?.data?.user?.role;
 
+      if (!token || !role) throw new Error("Invalid server response");
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+      
+      dispatch(adminLogin({role, token}));
       navigate('/admin-dashboard');
+
     } catch (error) {
       console.error('Login failed:', error.message);
       alert('Invalid credentials. Please try again.');

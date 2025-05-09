@@ -56,6 +56,18 @@ const AddDoctor = () => {
               />
             </div>
             <div className='mb-5'>
+              <label className="block font-medium mb-2 text-lg" htmlFor='password'>password</label>
+              <input
+                type="password"
+                id="password"
+                {...register('password', { required: true })}
+                className="w-full border border-gray-300 rounded px-3 py-2"
+                placeholder="Enter password"
+              />
+            </div>
+          </div>
+          <div className='w-full'>
+            <div className='mb-5'>
               <label className="block font-medium mb-2 text-lg" htmlFor='experience'>Experience</label>
               <input
                 type="text"
@@ -65,8 +77,6 @@ const AddDoctor = () => {
                 placeholder="Enter years of experience"
               />
             </div>
-          </div>
-          <div className='w-full'>
             <div className='mb-5'>
               <label className="block font-medium mb-2 text-lg" htmlFor='phone'>Phone Number</label>
               <input

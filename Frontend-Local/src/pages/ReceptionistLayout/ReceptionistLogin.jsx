@@ -9,20 +9,24 @@ function ReceptionistLogin() {
   const dispatch = useDispatch()
 
   const handleSubmit = async (data) => {
-      try {
-        const { username, password } = data; 
-        
-        const response = await authService.login(username, password, 'receptionist');
-        const { token } = response;
-        localStorage.setItem('token', token);
-        
-        dispatch(receptionistLogin({username, role: 'receptionist', token}));
-  
-        navigate('/receptionist-dashboard');
-      } catch (error) {
-        console.error('Login failed:', error.message);
-        alert('Invalid credentials. Please try again.');
-      }
+    try {
+      const { loginId, password } = data; 
+      
+      const response = await authService.login(loginId, password, 'receptionist');
+      const token  = response?.data?.accessToken;
+      const role =  response?.data?.user?.role;
+
+      if (!token || !role) throw new Error("Invalid server response");
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
+      dispatch(receptionistLogin({role, token}));
+
+      navigate('/receptionist-dashboard');
+    } catch (error) {
+      console.error('Login failed:', error.message);
+      alert('Invalid credentials. Please try again.');
+    }
   };
 
   return (

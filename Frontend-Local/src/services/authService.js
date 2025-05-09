@@ -1,25 +1,45 @@
 import { api } from '../app/api';
 
 class AuthService {
-  async login(username, password, role) {
+  async login(loginId, password, role) {
     try {
-      console.log(`Service Data:`);
-      console.log({username,password,role});
-      
-      return {username, token: 'token123',role}
-      // const response = await api.post('/login', { username, password, role });
-      // return response.data;
+      console.log(`Service Data: `);
+      console.log({loginId,password,role});
+      const response = await api.post('/users/login', { loginId, password, role });
+      return response.data;
+
     } catch (error) {
       console.error('Login error:', error.response?.data || error.message);
       throw error; 
     }
   }
 
-  logout(role) {
-    console.log(`${role}: Logged out`);
-    localStorage.removeItem('token'); 
+  async logout(role) {
+    try {
+      const response = await api.post('/users/logout'); 
+
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      console.log(`${role}: Logged out`);
+
+      return response.data;
+    } catch (error) {
+      console.error('Logout failed:', error);
+      throw error;
+    }
   }
 
+  async getUserProfile() {
+    try {
+      const response = await api.get('/users/profile');      
+      console.log(response.data);
+       
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching user profile:', error);
+      throw error;
+    }
+  }
   // Use of these methods will be done after the backend
   isAuthenticated() {
     const token = localStorage.getItem('token');

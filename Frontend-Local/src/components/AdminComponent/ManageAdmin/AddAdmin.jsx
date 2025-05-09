@@ -46,13 +46,13 @@ const AddAdmin = () => {
       </div>
 
       <div>
-        <label className="block font-medium mb-1" htmlFor='experience'>Experience</label>
+        <label className="block font-medium mb-1" htmlFor='password'>Password</label>
         <input
-          type="text"
-          id="experience"
-          {...register('experience', { required: true })}
+          type="password"
+          id="password"
+          {...register('password', { required: true })}
           className="w-full border border-gray-300 rounded px-3 py-2"
-          placeholder="Enter years of experience"
+          placeholder="Enter your of password"
         />
       </div>
       <div>

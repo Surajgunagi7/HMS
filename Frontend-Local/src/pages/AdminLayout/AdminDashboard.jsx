@@ -8,8 +8,10 @@ import {
   Users,
   Activity
 } from "lucide-react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { authService } from "../../services/authService";
+import { useDispatch, useSelector } from 'react-redux';
+import {addUser as addAdmin } from '../../store/authSlice'
 
 const MANAGEMENT_ITEMS = [
   { name: "Admin", icon: UserCog, color: "#4B5563", href: "manage-admins" },
@@ -17,13 +19,29 @@ const MANAGEMENT_ITEMS = [
   { name: "Receptionist", icon: Users, color: "#4B5563", href: "manage-receptionists" },
 ];
 
-const REPORT_ITEMS = [
-  { name: "Sales", icon: ChartColumnBig, color: "#4B5563", href: "sales" },
+const REPORT_ITEMS = [  // Sales -> Revenues
+  { name: "Revenues", icon: ChartColumnBig, color: "#4B5563", href: "sales" },
   { name: "Activity", icon: Activity, color: "#4B5563", href: "activity" },
 ];
 
-const AdminDashboard = ({ adminId = 'AD1234', adminName = "admin123" }) => {
+const AdminDashboard = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const dispatch = useDispatch();
+  const {user}  = useSelector((state) => state.auth)
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res =  await authService.getUserProfile();
+        dispatch(addAdmin(res.data));
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    };
+
+    fetchUser();
+  }, [dispatch]);
+
 
   return (
     <div className="h-screen w-full flex">
@@ -126,13 +144,13 @@ const AdminDashboard = ({ adminId = 'AD1234', adminName = "admin123" }) => {
               <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center
                 transition-transform duration-300 hover:scale-110">
                 <span className="text-white font-medium">
-                  {adminName.charAt(0)}
+                  {user?.name.charAt(0)}
                 </span>
               </div>
               {isSidebarOpen && (
                 <div className="ml-3 transition-all duration-300 ease-out">
-                  <p className="text-sm font-medium text-gray-700">{adminName}</p>
-                  <p className="text-xs text-gray-500">ID: {adminId}</p>
+                  <p className="text-sm font-medium text-gray-700">{user?.name}</p>
+                  <p className="text-xs text-gray-500">ID: {user?.loginId}</p>
                 </div>
               )}
             </div>

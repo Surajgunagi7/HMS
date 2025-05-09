@@ -1,4 +1,3 @@
-import React from 'react';
 import { UserCircle, Lock, Building2 } from 'lucide-react';
 
 const LoginForm = ({ role, onSubmit }) => {
@@ -25,7 +24,7 @@ const LoginForm = ({ role, onSubmit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = {
-      username: e.target.username.value,
+      loginId: e.target.loginId.value,
       password: e.target.password.value
     };
     onSubmit(formData);
@@ -49,12 +48,12 @@ const LoginForm = ({ role, onSubmit }) => {
           <UserCircle className={`absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 ${styles.iconColor}`} />
           <input
             type="text"
-            id="username"
-            name="username"
+            id="loginId"
+            name="loginId"
             className={`w-full pl-10 pr-3 py-3 bg-white/50 backdrop-blur-sm border-0
               rounded-lg focus:ring-2 ${styles.ringColor} focus:border-transparent
               transition-all duration-300 placeholder-gray-500`}
-            placeholder="Username"
+            placeholder="LoginId"
             required
           />
         </div>

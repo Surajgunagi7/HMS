@@ -7,7 +7,7 @@ const adminSlice = createSlice({
       id : "11",
       name: "admin123",
       email: "admin@gmail.com",
-      experience: "20",
+      password: "20",
       phone: "123-456-7890",
   }], 
   },

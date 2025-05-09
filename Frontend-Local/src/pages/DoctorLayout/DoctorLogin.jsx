@@ -9,20 +9,25 @@ function DoctorLogin() {
   const dispatch = useDispatch()
 
   const handleSubmit = async (data) => {
-      try {
-        const { username, password } = data; 
+    try {
+      const { loginId, password } = data; 
+      
+      const response = await authService.login(loginId, password, 'doctor');
+      const token  = response?.data?.accessToken;
+      const role =  response?.data?.user?.role;
+
+      if (!token || !role) throw new Error("Invalid server response");
+
+      localStorage.setItem('token', token);
+      localStorage.setItem('role', role);
         
-        const response = await authService.login(username, password, 'doctor');
-        const { token } = response;
-        localStorage.setItem('token', token);
-        
-        dispatch(doctorLogin({username, role: 'doctor', token}));
-  
-        navigate('/doctor-dashboard');
-      } catch (error) {
-        console.error('Login failed:', error.message);
-        alert('Invalid credentials. Please try again.');
-      }
+      dispatch(doctorLogin({role, token}));
+
+      navigate('/doctor-dashboard');
+    } catch (error) {
+      console.error('Login failed:', error.message);
+      alert('Invalid credentials. Please try again.');
+    }
   };
   
 
