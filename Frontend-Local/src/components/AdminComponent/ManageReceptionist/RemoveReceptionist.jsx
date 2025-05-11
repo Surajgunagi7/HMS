@@ -12,7 +12,6 @@ const RemoveReceptionist = () => {
       alert("Please enter a valid Receptionist ID.");
       return;
     }
-    // We need to do the error handling if the receptionist does not exists
     try {
       await receptionistService.removeReceptionist(receptionistId);
       console.log(`Receptionist with ID ${receptionistId} has been removed from backend.`);
@@ -23,7 +22,7 @@ const RemoveReceptionist = () => {
       setReceptionistId(""); 
     } catch (error) {
       console.error("Error removing receptionist:", error.message);
-      alert("Failed to remove receptionist. Please try again.");
+      alert(error?.response?.data?.message || "Failed to remove receptionist.");
     }
   };
 

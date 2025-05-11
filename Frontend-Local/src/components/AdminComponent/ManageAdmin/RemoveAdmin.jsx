@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { adminService } from "../../../services/adminDashboardService";
-import { deleteAdmin } from "../../../store/adminSlice"; 
+import { deleteAdmin } from "../../../store/adminSlice";
 
 const RemoveAdmin = () => {
   const [adminId, setAdminId] = useState("");
@@ -12,18 +12,17 @@ const RemoveAdmin = () => {
       alert("Please enter a valid Admin ID.");
       return;
     }
-    // We need to do the error handling if the admin does not exists
     try {
       await adminService.removeAdmin(adminId);
       console.log(`Admin with ID ${adminId} has been removed from backend.`);
 
       dispatch(deleteAdmin(adminId));
       alert(`Admin with ID ${adminId} has been removed.`);
-      
-      setAdminId(""); 
+
+      setAdminId("");
     } catch (error) {
       console.error("Error removing admin:", error.message);
-      alert("Failed to remove admin. Please try again.");
+      alert(error?.response?.data?.message || "Failed to remove admin.");
     }
   };
 

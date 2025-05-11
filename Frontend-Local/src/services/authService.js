@@ -40,6 +40,7 @@ class AuthService {
       throw error;
     }
   }
+  
   // Use of these methods will be done after the backend
   isAuthenticated() {
     const token = localStorage.getItem('token');

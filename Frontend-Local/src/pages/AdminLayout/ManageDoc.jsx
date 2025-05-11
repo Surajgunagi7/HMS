@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddDoctor, UpdateDoctor, RemoveDoctor } from "../../components";
-  
+
 const ManageDoc = () => {
   const [activeTab, setActiveTab] = useState("add");
   const navigate = useNavigate(); // Hook for navigation

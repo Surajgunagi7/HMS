@@ -3,27 +3,30 @@ import { createSlice } from "@reduxjs/toolkit";
 const receptionistSlice = createSlice({
   name: "receptionist",
   initialState: {
-    receptionists: [{
-      id : "111",
-      name: "receptionist123",
-      email: "receptionist@gmail.com",
-      experience: "20",
-      phone: "123-456-7890",
-  }], 
+    receptionists: [{}], 
   },
   reducers: {
     addReceptionist: (state, action) => {
-      state.receptionists.push(action.payload);
+      const payload = action.payload;
+      if (Array.isArray(payload)) {
+        state.receptionists = [...state.receptionists, ...payload];
+      } else if (payload) {
+        state.receptionists.push(payload);
+      } else {
+        console.warn("Empty payload in addReceptionist");
+      }
     },
     deleteReceptionist: (state, action) => {
       const receptionistId = action.payload;
-      state.receptionists = state.receptionists.filter((rec) => rec.id !== receptionistId);
+      state.receptionists = state.receptionists.filter((receptionist) => receptionist.loginId !== receptionistId);
     },
     updateReceptionist: (state, action) => {
       const { id, updates } = action.payload;
-      const receptionist = state.receptionists.find((rec) => rec.id === id);
+      const receptionist = state.receptionists.find((ad) => ad._id === id);
       if (receptionist) {
-        Object.assign(receptionist, updates); 
+        Object.assign(receptionist, updates);
+      } else {
+        console.warn(`Receptionist with _id ${id} not found in store`);
       }
     },
   },

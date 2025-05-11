@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddReceptionist, UpdateReceptionist, RemoveReceptionist } from "../../components"; // Import the relevant components
 

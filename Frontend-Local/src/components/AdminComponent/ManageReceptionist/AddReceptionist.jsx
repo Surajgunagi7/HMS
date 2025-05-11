@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { addReceptionist } from '../../../store/receptionistSlice';
 import {receptionistService} from '../../../services/adminDashboardService'
+import toast from 'react-hot-toast';
 
 const AddReceptionist = () => {
     const { register, handleSubmit, reset } = useForm();
@@ -9,11 +10,14 @@ const AddReceptionist = () => {
   
     const onSubmit = async (data) => {
       try {
-        const response = await receptionistService.addReceptionist(data); 
-        console.log('Receptionist added:', response);
+        const {name, email, password, phone} = data;
+
+        const response = await receptionistService.addReceptionist({name, email, password, phone, role: "receptionist"}); 
+        console.log('Receptionist added:', response.data);
+        dispatch(addReceptionist(response.data));
+
         reset();
-  
-        dispatch(addReceptionist(response));
+        toast.success('Receptionist added successfully!');
       } catch (error) {
         console.error('Error adding receptionist:', error.message);
         alert('Failed to add receptionist. Please try again.');

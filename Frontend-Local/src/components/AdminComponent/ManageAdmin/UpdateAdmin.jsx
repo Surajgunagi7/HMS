@@ -3,31 +3,31 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { adminService } from "../../../services/adminDashboardService";
 import { updateAdmin } from "../../../store/adminSlice";
+import toast from 'react-hot-toast';
+
+const editableFields = ["name", "email", "phone"];
 
 const UpdateAdmin = () => {
-  const [adminId, setAdminId] = useState("");
-  const [adminDetails, setAdminDetails] = useState(null); 
+  const [adminIdInput, setAdminIdInput] = useState("");
+  const [adminDetails, setAdminDetails] = useState(null);
   const dispatch = useDispatch();
   const admins = useSelector((state) => state.admin?.admins || []);
   const { register, handleSubmit, setValue, reset } = useForm();
 
   const fetchAdminDetails = () => {
-    if (!adminId.trim()) {
+    if (!adminIdInput.trim()) {
       alert("Please enter a valid Admin ID.");
       return;
     }
 
-    const admin = admins.find((ad) => ad.id === adminId);
+    const admin = admins.find(ad => ad.loginId === adminIdInput);
     if (!admin) {
       alert("Admin with the given ID does not exist.");
       return;
     }
 
     setAdminDetails(admin);
-
-    Object.keys(admin).forEach((key) => {
-      setValue(key, admin[key]);
-    });
+    editableFields.forEach((key) => setValue(key, admin[key]));
   };
 
   const onSubmit = async (data) => {
@@ -37,13 +37,13 @@ const UpdateAdmin = () => {
     }
 
     try {
-      const updatedAdmin = await adminService.updateAdmin(adminId, data);
-      console.log(`Admin with ID ${adminId} has been updated in backend.`);
+      const updatedAdmin = await adminService.updateAdmin(adminDetails._id, data);
 
-      dispatch(updateAdmin({ id: adminId, updates: updatedAdmin }));
-      alert(`Admin with ID ${adminId} has been updated successfully.`);
+      dispatch(updateAdmin({ id: adminDetails._id, updates: updatedAdmin.data })); 
 
-      setAdminId("");
+      toast.success(`Admin with ID ${adminDetails.loginId} has been updated successfully.`);
+
+      setAdminIdInput("");
       setAdminDetails(null);
       reset();
     } catch (error) {
@@ -58,8 +58,8 @@ const UpdateAdmin = () => {
       <input
         type="text"
         placeholder="Enter Admin ID"
-        value={adminId}
-        onChange={(e) => setAdminId(e.target.value)}
+        value={adminIdInput}
+        onChange={(e) => setAdminIdInput(e.target.value)}
         className="w-full border border-gray-300 rounded px-3 py-2"
       />
       <button
@@ -72,7 +72,7 @@ const UpdateAdmin = () => {
       {/* Form for updating admin details */}
       {adminDetails && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {Object.keys(adminDetails).map((key) => (
+          {editableFields.map((key) => (
             <div key={key}>
               <label className="block text-sm font-medium text-gray-700 capitalize">
                 {key}

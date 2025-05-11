@@ -10,8 +10,13 @@ import {
 } from "lucide-react";
 import { useState,useEffect } from "react";
 import { authService } from "../../services/authService";
+import { adminService, doctorService, receptionistService } from "../../services/adminDashboardService";
+
 import { useDispatch, useSelector } from 'react-redux';
 import {addUser as addAdmin } from '../../store/authSlice'
+import { addAdmin as addAdminList } from "../../store/adminSlice";
+import { addDoctor as addDoctorList } from "../../store/doctorSlice";
+import { addReceptionist as addReceptionistList } from "../../store/receptionistSlice";
 
 const MANAGEMENT_ITEMS = [
   { name: "Admin", icon: UserCog, color: "#4B5563", href: "manage-admins" },
@@ -34,6 +39,16 @@ const AdminDashboard = () => {
       try {
         const res =  await authService.getUserProfile();
         dispatch(addAdmin(res.data));
+
+        const responseAdmin = await adminService.getAdminList('admin');
+        dispatch(addAdminList(responseAdmin.data));
+
+        const responseDoctor = await doctorService.getDoctorList('doctor');
+        dispatch(addDoctorList(responseDoctor.data));
+
+        const responseReceptionist = await receptionistService.getReceptionistList('receptionist');
+        dispatch(addReceptionistList(responseReceptionist.data));
+        
       } catch (err) {
         console.error('Error fetching user:', err);
       }

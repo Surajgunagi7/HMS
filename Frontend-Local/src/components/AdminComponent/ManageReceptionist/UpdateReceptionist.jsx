@@ -3,31 +3,33 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "react-hook-form";
 import { receptionistService } from "../../../services/adminDashboardService";
 import { updateReceptionist } from "../../../store/receptionistSlice";
+import toast from 'react-hot-toast';
+
+const editableFields = ["name", "email", "phone"];
 
 const UpdateReceptionist = () => {
-  const [receptionistId, setReceptionistId] = useState("");
+  const [receptionistIdInput, setReceptionistIdInput] = useState("");
   const [receptionistDetails, setReceptionistDetails] = useState(null); 
   const dispatch = useDispatch();
   const receptionists = useSelector((state) => state.receptionist?.receptionists || []);
   const { register, handleSubmit, setValue, reset } = useForm();
 
   const fetchReceptionistDetails = () => {
-    if (!receptionistId.trim()) {
+    if (!receptionistIdInput.trim()) {
       alert("Please enter a valid Receptionist ID.");
       return;
     }
 
-    const receptionist = receptionists.find((rec) => rec.id === receptionistId);
+    console.log(receptionists);
+    
+    const receptionist = receptionists.find((rec) => rec.loginId === receptionistIdInput);
     if (!receptionist) {
       alert("Receptionist with the given ID does not exist.");
       return;
     }
 
     setReceptionistDetails(receptionist);
-
-    Object.keys(receptionist).forEach((key) => {
-      setValue(key, receptionist[key]);
-    });
+    editableFields.forEach((key) => setValue(key, receptionist[key]));
   };
 
   const onSubmit = async (data) => {
@@ -37,13 +39,13 @@ const UpdateReceptionist = () => {
     }
 
     try {
-      const updatedReceptionist = await receptionistService.updateReceptionist(receptionistId, data);
-      console.log(`Receptionist with ID ${receptionistId} has been updated in backend.`);
+      const updatedReceptionist = await receptionistService.updateReceptionist(receptionistDetails._id, data);
 
-      dispatch(updateReceptionist({ id: receptionistId, updates: updatedReceptionist }));
-      alert(`Receptionist with ID ${receptionistId} has been updated successfully.`);
+      dispatch(updateReceptionist({ id: receptionistDetails._id, updates: updatedReceptionist.data }));
 
-      setReceptionistId("");
+      toast.success(`Receptionist with ID ${receptionistDetails.loginId} has been updated successfully.`);
+    
+      setReceptionistIdInput("");
       setReceptionistDetails(null);
       reset();
     } catch (error) {
@@ -57,9 +59,9 @@ const UpdateReceptionist = () => {
       {/* Input Receptionist ID */}
       <input
         type="text"
-        placeholder="Enter Admin ID"
-        value={receptionistId}
-        onChange={(e) => setReceptionistId(e.target.value)}
+        placeholder="Enter Receptionist ID"
+        value={receptionistIdInput}
+        onChange={(e) => setReceptionistIdInput(e.target.value)}
         className="w-full border border-gray-300 rounded px-3 py-2"
       />
       <button
@@ -72,7 +74,7 @@ const UpdateReceptionist = () => {
       {/* Form for updating receptionist details */}
       {receptionistDetails && (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {Object.keys(receptionistDetails).map((key) => (
+          {editableFields.map((key) => (
             <div key={key}>
               <label className="block text-sm font-medium text-gray-700 capitalize">
                 {key}

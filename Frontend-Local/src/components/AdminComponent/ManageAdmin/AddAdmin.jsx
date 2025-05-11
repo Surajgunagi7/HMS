@@ -2,18 +2,23 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { addAdmin } from '../../../store/adminSlice';
 import {adminService} from '../../../services/adminDashboardService'
+import toast from 'react-hot-toast';
 
 const AddAdmin = () => {
     const { register, handleSubmit, reset } = useForm();
     const dispatch = useDispatch();
-  
+
     const onSubmit = async (data) => {
       try {
-        const response = await adminService.addAdmin(data); 
-        console.log('Admin added:', response);
+        const {name, email, password, phone} = data;
+
+        const response = await adminService.addAdmin({name, email, password, phone, role:'admin'}); 
+        console.log('Admin added:', response.data);
+        dispatch(addAdmin(response.data));
+
         reset();
-  
-        dispatch(addAdmin(response));
+        toast.success('Admin added successfully!');
+        
       } catch (error) {
         console.error('Error adding admin:', error.message);
         alert('Failed to add admin. Please try again.');
@@ -69,7 +74,7 @@ const AddAdmin = () => {
         type="submit"
         className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
       >
-        Add Doctor
+        Add Admin
       </button>
     </form>
   );

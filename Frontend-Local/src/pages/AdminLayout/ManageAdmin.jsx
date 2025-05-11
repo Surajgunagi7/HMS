@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddAdmin, UpdateAdmin, RemoveAdmin } from "../../components"; // Import the relevant components
 
 const ManageAdmin = () => {
   const [activeTab, setActiveTab] = useState("add");
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate(); 
 
   return (
     <div className="p-4">

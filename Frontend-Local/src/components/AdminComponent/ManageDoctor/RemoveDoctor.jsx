@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { doctorService } from "../../../services/adminDashboardService";
-import { deleteDoctor } from "../../../store/doctorSlice"; 
+import { deleteDoctor } from "../../../store/doctorSlice";
 
 const RemoveDoctor = () => {
   const [doctorId, setDoctorId] = useState("");
@@ -12,18 +12,17 @@ const RemoveDoctor = () => {
       alert("Please enter a valid Doctor ID.");
       return;
     }
-    // We need to do the error handling if the doctor does not exists
     try {
       await doctorService.removeDoctor(doctorId);
       console.log(`Doctor with ID ${doctorId} has been removed from backend.`);
 
       dispatch(deleteDoctor(doctorId));
       alert(`Doctor with ID ${doctorId} has been removed.`);
-      
-      setDoctorId(""); 
+
+      setDoctorId("");
     } catch (error) {
       console.error("Error removing doctor:", error.message);
-      alert("Failed to remove doctor. Please try again.");
+      alert(error?.response?.data?.message || "Failed to remove doctor.");
     }
   };
 

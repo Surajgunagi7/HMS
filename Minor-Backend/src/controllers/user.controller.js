@@ -39,10 +39,14 @@ const generateId = (role) => {
 
 const registerUser = asyncHandler( async (req, res) => {
     
-    const {name, email, password, role, phone, specialization} = req.body;
+    const {name, email, password, role, phone, specialization, about} = req.body;
 
     if([name, email, password, role, phone, specialization].some((field) => field?.trim() === "" )) {
         throw new ApiError(400, "All fields are required");
+    }
+
+    if (role === "doctor" && !specialization?.trim()) {
+        throw new ApiError(400, "Specialization is required for doctors");
     }
 
     const existedUser = await User.findOne({
@@ -55,16 +59,20 @@ const registerUser = asyncHandler( async (req, res) => {
 
     const loginId = generateId(role);
 
-    const user = await User.create({
+    const userData = {
         name,
         email,
         password,
         role,
         loginId,
         phone,
-        specialization
-    })
+    };
+    if (role === "doctor") {
+        userData.specialization = specialization;
+        userData.about = about;
+    }
 
+    const user = await User.create(userData);
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
@@ -190,23 +198,31 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const {name, email, role, specialization, phone,_id } = req.body
+    const {name, email, role, specialization, phone, _id, about } = req.body
     if([name, email, role, phone, specialization].some((field) => field?.trim() === "" )) {
         throw new ApiError(400, "All fields are required")
     }
 
+    const updateFields = {
+        name,
+        email,
+        specialization,
+        phone,
+    };
+
+    if (about && typeof about === 'object') {
+        updateFields.about = {
+            experience: about.experience,
+            education: about.education,
+            description: about.description
+        };
+    }
+    
     const user = await User.findByIdAndUpdate(
         _id,
-        {
-            $set: {
-                name: name,
-                email: email,
-                specialization: specialization,
-                phone: phone
-            }
-        },
-        {new: true}
-    ).select("-password -refreshToken")
+        { $set: updateFields },
+        { new: true }
+    ).select("-password -refreshToken");
 
     return res
     .status(200)
@@ -235,7 +251,7 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 
     const { loginId } = req.params;
-
+    
     const user = await User.findOneAndDelete({ loginId });
 
     if (!user) {
@@ -243,6 +259,29 @@ const deleteUser = asyncHandler(async (req, res) => {
     }
 
     res.status(200).json(new ApiResponse(200, {}, 'User deleted successfully'));
+});
+
+const getUsersByRole = asyncHandler(async (req, res) => {
+    const { role } = req.params; 
+    
+    const validRoles = ['admin', 'doctor', 'receptionist']; 
+    if (!validRoles.includes(role.toLowerCase())) {
+        throw new ApiError(400, 'Invalid role provided');
+    }
+
+    try {
+        const users = await User.find({ role }).select('-password -refreshToken');
+
+        if (!users || users.length === 0) {
+            throw new ApiError(404, `No ${role}s found`);
+        }
+
+        res.status(200).json(
+            new ApiResponse(200, users, `${role}s fetched successfully`)
+        );
+    } catch (error) {
+        throw new ApiError(500, `Something went wrong while fetching ${role}s`);
+    }
 });
 
 /* TODO
@@ -256,5 +295,6 @@ export {
     refreshAccessToken,
     updateAccountDetails,
     getUserProfile,
-    deleteUser
+    deleteUser,
+    getUsersByRole
 }
