@@ -1,5 +1,8 @@
 import { useForm } from "react-hook-form";
+import { useSelector } from "react-redux";
 import { Calendar, Clock, User, Mail, Phone, Stethoscope, FileText } from 'lucide-react';
+import {patientService} from '../../services/patientService'
+import { appointmentService } from "../../services/appointmentsService";
 
 const CreateAppointment = () => {
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -8,15 +11,43 @@ const CreateAppointment = () => {
       age: "",
       email: "",
       phone: "",
-      doctorName: "",
+      doctorId: "",
       reason: "",
       appointmentDate: "",
       appointmentTime: ""
     }
   });
 
-  const onSubmit = (data) => {
-    console.log("Form submitted:", data);
+  const doctors = useSelector((state) => state.doctor.doctors);
+  
+  const onSubmit = async (data) => {
+      try {
+          const patientDetails = {
+            name: data.patientName,
+            age: data.age,
+            email: data.email,
+            phone: data.phone,
+        };
+
+        const patientRes = await patientService.createOrFindPatient(patientDetails);
+        const patientId = patientRes.data.data._id;
+      
+        const appointmentPayload = {
+          patient: patientId,
+          doctor: data.doctorId,
+          reason: data.reason,
+          dateTime: `${data.appointmentDate}T${data.appointmentTime}:00.000Z`,
+          status: "pending",
+          paymentStatus: "pending"
+        };
+
+        const response = await appointmentService.createAppointment(appointmentPayload);
+        console.log("Appointment created successfully:", response);
+        
+        alert("Appointment created successfully!");
+      } catch (error) {
+        console.error("Error creating appointment:", error);
+      }
   };
 
   const InputField = ({ icon: Icon, ...props }) => (
@@ -63,30 +94,10 @@ const CreateAppointment = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Patient Information</h3>
                 <div className="space-y-4">
-                  <InputField
-                    icon={User}
-                    type="text"
-                    name="patientName"
-                    placeholder="Patient Name"
-                  />
-                  <InputField
-                    icon={User}
-                    type="number"
-                    name="age"
-                    placeholder="Age"
-                  />
-                  <InputField
-                    icon={Mail}
-                    type="email"
-                    name="email"
-                    placeholder="Email Address"
-                  />
-                  <InputField
-                    icon={Phone}
-                    type="tel"
-                    name="phone"
-                    placeholder="Phone Number"
-                  />
+                  <InputField icon={User} type="text" name="patientName" placeholder="Patient Name" />
+                  <InputField icon={User} type="number" name="age" placeholder="Age" />
+                  <InputField icon={Mail} type="email" name="email" placeholder="Email Address" />
+                  <InputField icon={Phone} type="tel" name="phone" placeholder="Phone Number" />
                 </div>
               </div>
             </div>
@@ -95,12 +106,28 @@ const CreateAppointment = () => {
               <div>
                 <h3 className="text-lg font-medium text-gray-900 mb-4">Appointment Details</h3>
                 <div className="space-y-4">
-                  <InputField
-                    icon={Stethoscope}
-                    type="text"
-                    name="doctorName"
-                    placeholder="Doctor's Name"
-                  />
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Stethoscope className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <select
+                      {...register("doctorId", { required: "Please select a doctor" })}
+                      className={`w-full pl-10 pr-4 py-3 bg-gray-50 border ${
+                        errors.doctorId ? 'border-red-300' : 'border-gray-200'
+                      } rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors`}
+                    >
+                      <option value="">Select Doctor</option>
+                      {doctors.map((doc) => (
+                        <option key={doc._id} value={doc._id}>
+                          Dr. {doc.name}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.doctorId && (
+                      <p className="mt-1 text-sm text-red-500">{errors.doctorId.message}</p>
+                    )}
+                  </div>
+
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <FileText className="h-5 w-5 text-gray-400" />
@@ -117,17 +144,10 @@ const CreateAppointment = () => {
                       <p className="mt-1 text-sm text-red-500">{errors.reason.message}</p>
                     )}
                   </div>
+
                   <div className="grid grid-cols-2 gap-4">
-                    <InputField
-                      icon={Calendar}
-                      type="date"
-                      name="appointmentDate"
-                    />
-                    <InputField
-                      icon={Clock}
-                      type="time"
-                      name="appointmentTime"
-                    />
+                    <InputField icon={Calendar} type="date" name="appointmentDate" />
+                    <InputField icon={Clock} type="time" name="appointmentTime" />
                   </div>
                 </div>
               </div>

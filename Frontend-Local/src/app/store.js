@@ -4,6 +4,7 @@ import adminDashboardReducer from '../store/adminDashboardSlice';
 import doctorReducer from '../store/doctorSlice'
 import adminReducer from '../store/adminSlice'
 import receptionistReducer from '../store/receptionistSlice'
+import appointmentReducer from '../store/appointmentSlice'
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     adminDashboard: adminDashboardReducer,
     doctor: doctorReducer,
     admin: adminReducer,
-    receptionist: receptionistReducer
+    receptionist: receptionistReducer,
+    appointment: appointmentReducer
   },
 });

@@ -22,10 +22,11 @@ app.get("/", (req, res) => {
 
 import userRouter from './routes/user.route.js'
 import patientRouter from './routes/patient.route.js'
+import appointmentRouter from './routes/appointment.route.js'
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/patients", patientRouter)
-
+app.use("/api/v1/appointments", appointmentRouter)
 
 
 export { app }

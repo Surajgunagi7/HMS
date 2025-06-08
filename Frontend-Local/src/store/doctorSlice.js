@@ -8,13 +8,7 @@ const doctorSlice = createSlice({
   reducers: {
     addDoctor: (state, action) => {
       const payload = action.payload;
-      if (Array.isArray(payload)) {
-        state.doctors = [...state.doctors, ...payload];
-      } else if (payload) {
-        state.doctors.push(payload);
-      } else {
-        console.warn("Empty payload in addDoctor");
-      }
+      state.doctors = payload
     },
     deleteDoctor: (state, action) => {
       const doctorId = action.payload;

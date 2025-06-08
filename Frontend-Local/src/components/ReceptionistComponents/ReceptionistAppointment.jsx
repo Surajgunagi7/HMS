@@ -1,42 +1,49 @@
-import  { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Calendar, Clock, Search, CheckCircle, XCircle } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { appointmentService } from '../../services/appointmentsService';
+import {
+  setAppointments,
+  updateAppointmentStatus
+} from '../../store/appointmentSlice';
 
 const ReceptionistAppointment = () => {
-  const [appointments, setAppointments] = useState([
-    { id: "1", patientId: "101", patientName: "John Doe", appointmentDate: "2024-12-05", appointmentTime: "10:00 AM", status: "Pending" },
-    { id: "2", patientId: "102", patientName: "Jane Smith", appointmentDate: "2024-12-06", appointmentTime: "11:30 AM", status: "Approved" },
-    { id: "3", patientId: "103", patientName: "Alice Johnson", appointmentDate: "2024-12-07", appointmentTime: "01:00 PM", status: "Pending" },
-  ]);
-
+  const dispatch = useDispatch();
+  const appointments = useSelector(state => state.appointment.list);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const handleAcceptAppointment = (id) => {
-    setAppointments(
-      appointments.map((appointment) =>
-        appointment.id === id ? { ...appointment, status: "Approved" } : appointment
-      )
-    );
-  };
+  useEffect(() => {
+    const fetchAppointments = async () => {
+      try {
+        const response = await appointmentService.getAppointments();
+        dispatch(setAppointments(response.data));
+      } catch (err) {
+        console.error("Failed to fetch appointments:", err);
+      }
+    };
+    fetchAppointments();
+  }, [dispatch]);
 
-  const handleRejectAppointment = (id) => {
-    setAppointments(
-      appointments.filter((appointment) => appointment.id !== id)
-    );
+  const handleUpdateAppointment = async (id, status) => {
+    try {
+      await appointmentService.updateAppointment(id, { status });
+      dispatch(updateAppointmentStatus({ id, status }));
+    } catch (err) {
+      console.error(`Failed to ${status.toLowerCase()} appointment:`, err);
+    }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Approved':
-        return 'bg-green-100 text-green-800';
-      case 'Pending':
-        return 'bg-yellow-100 text-yellow-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'confirmed': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
   const filteredAppointments = appointments.filter(appointment =>
-    appointment.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    appointment.patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     appointment.patientId.includes(searchTerm)
   );
 
@@ -70,15 +77,15 @@ const ReceptionistAppointment = () => {
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredAppointments.map((appointment) => (
-                <tr key={appointment.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{appointment.patientId}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{appointment.patientName}</td>
+                <tr key={appointment._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{appointment.patient.patientId}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{appointment.patient.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <div className="flex items-center">
                       <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                      {appointment.appointmentDate}
+                      {new Date(appointment.dateTime).toLocaleDateString()}
                       <Clock className="w-4 h-4 ml-4 mr-2 text-gray-400" />
-                      {appointment.appointmentTime}
+                      {new Date(appointment.dateTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -87,16 +94,16 @@ const ReceptionistAppointment = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {appointment.status === "Pending" && (
+                    {appointment.status === "pending" && (
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleAcceptAppointment(appointment.id)}
+                          onClick={() => handleUpdateAppointment(appointment._id, "confirmed")}
                           className="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                         >
                           <CheckCircle className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleRejectAppointment(appointment.id)}
+                          onClick={() => handleUpdateAppointment(appointment._id, "cancelled")}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <XCircle className="w-5 h-5" />

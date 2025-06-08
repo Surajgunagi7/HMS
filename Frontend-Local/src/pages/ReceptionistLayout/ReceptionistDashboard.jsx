@@ -1,15 +1,40 @@
-import React from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
-import { LogOut, User, Calendar, UserPlus, Search, PhoneCall } from "lucide-react";
+import { LogOut, Calendar, UserPlus, Search, PhoneCall } from "lucide-react";
 import { authService } from '../../services/authService';
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { appointmentService } from "../../services/appointmentsService";
+import { setAppointments } from "../../store/appointmentSlice";
+import { addDoctor as addDoctorList } from "../../store/doctorSlice";
+import {  doctorService } from "../../services/adminDashboardService";
 
 const ReceptionistDashboard = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     authService.logout('receptionist');
     navigate("/");
   };
+
+  useEffect(() => {
+  const fetchAppointments = async () => {
+    try {
+      const res = await appointmentService.getAppointments();
+      dispatch(setAppointments(res.data || []));
+      
+      const responseDoctor = await doctorService.getDoctorList('doctor');
+      
+      dispatch(addDoctorList(responseDoctor.data));
+
+    } catch (err) {
+      console.error("Error fetching appointments:", err);
+    }
+  };
+
+  fetchAppointments();
+}, [dispatch]);
+
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">

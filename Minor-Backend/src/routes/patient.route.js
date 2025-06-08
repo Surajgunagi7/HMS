@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { 
-    createPatient,
+    createOrFindPatient,
     searchPatient,
     getAllPatients,
     // getPatientById,
@@ -10,11 +10,12 @@ import {
 const router = Router();
 
 
-router.post("/createPatient", createPatient);
+router.post("/create-or-find-patient", createOrFindPatient);
 router.get("/searchPatient", searchPatient);
+router.post("/updatePatient/:id", updatePatient);
+
 router.get("/getAllPatient", getAllPatients);
 // router.get("/getPatientById/:id",getPatientById)
-router.post("/updatePatient/:id", updatePatient);
 router.delete("/deletePatient/:id", deletePatient);
 
 export default router;

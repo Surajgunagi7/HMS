@@ -9,12 +9,33 @@ import {
   Menu,
   X
 } from "lucide-react";
+import { appointmentService } from "../../services/appointmentsService";
+
+import { useDispatch } from "react-redux";
+import { setAppointments } from "../../store/appointmentSlice";
+import { addDoctor } from "../../store/doctorSlice";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const dispatch = useDispatch();
 
+  React.useEffect(() => {  
+      const fetchAppointments = async () => {
+        try {
+          const res = await appointmentService.getAppointments();
+          dispatch(setAppointments(res.data || []));
+
+          const resP = await authService.getUserProfile();
+          dispatch(addDoctor(resP.data));
+        } catch (err) {
+          console.error("Error fetching appointments:", err);
+        }
+      };
+      fetchAppointments();
+  }, [dispatch]);
+  
   const handleLogout = () => {
     authService.logout('doctor');
     navigate("/");

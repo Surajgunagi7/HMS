@@ -1,46 +1,51 @@
-import { asyncHandler } from '../utils/asyncHandler.js' 
+import { asyncHandler } from '../utils/AsyncHandler.js' 
 import { ApiError }  from '../utils/ApiError.js'
 import {ApiResponse} from '../utils/ApiResponse.js'
 import Patient from '../models/patient.model.js'
 
 
-const createPatient = asyncHandler(async (req, res) => {
-    const {
-      name,
-      email,
-      phone,
-      age,
-      gender,
-      medicalHistory,
-      emergencyContact,
-    } = req.body;
-  
-    if (!name || !phone) {
-      throw new ApiError(400, "Name and phone are required.");
-    }
-  
-    const existedPatient = await Patient.findOne({
-      $or: [{ phone }],
-    });
-  
-    if (existedPatient) {
-      throw new ApiError(409, "Patient with this email or phone already exists.");
-    }
-  
-    const newPatient = await Patient.create({
-      name,
-      email,
-      phone,
-      age,
-      gender,
-      medicalHistory,
-      emergencyContact,
-    });
-  
-    res.status(201).json(new ApiResponse(201, {
+const createOrFindPatient = asyncHandler(async (req, res) => {
+  const {
+    name,
+    email,
+    phone,
+    age,
+    gender,
+    medicalHistory,
+    emergencyContact,
+  } = req.body;
+
+  if (!name || !phone) {
+    throw new ApiError(400, "Name and phone are required.");
+  }
+
+  let patient = await Patient.findOne({ phone });
+
+  if (patient) {
+    return res.status(200).json(
+      new ApiResponse(200, {
         success: true,
-        data: newPatient,
-      },"Patient created successfully"));
+        data: patient,
+      }, "Existing patient returned")
+    );
+  }
+
+  patient = await Patient.create({
+    name,
+    email,
+    phone,
+    age,
+    gender,
+    medicalHistory,
+    emergencyContact,
+  });
+
+  res.status(201).json(
+    new ApiResponse(201, {
+      success: true,
+      data: patient,
+    }, "Patient created successfully")
+  );
 });
 
 const searchPatient = asyncHandler(async (req, res) => {
@@ -137,10 +142,9 @@ const deletePatient = asyncHandler(async (req, res) => {
 
   
 export { 
-    createPatient,
+    createOrFindPatient,
     searchPatient,
     getAllPatients,
-    // getPatientById,
     updatePatient,
     deletePatient
 };
