@@ -4,7 +4,6 @@ import { authService } from "../../services/authService";
 import { 
   UserCircle, 
   Calendar, 
-  FileText, 
   LogOut,
   Menu,
   X
@@ -52,11 +51,6 @@ const DoctorDashboard = () => {
       icon: Calendar,
       label: "Appointments"
     },
-    {
-      to: "/doctor-dashboard/prescriptions",
-      icon: FileText,
-      label: "Prescriptions"
-    }
   ];
 
   const isActive = (path) => location.pathname === path;

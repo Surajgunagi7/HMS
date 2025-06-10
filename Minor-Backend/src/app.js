@@ -23,10 +23,12 @@ app.get("/", (req, res) => {
 import userRouter from './routes/user.route.js'
 import patientRouter from './routes/patient.route.js'
 import appointmentRouter from './routes/appointment.route.js'
+import callRequestRouter from './routes/callRequest.route.js'
+
 
 app.use("/api/v1/users", userRouter)
 app.use("/api/v1/patients", patientRouter)
 app.use("/api/v1/appointments", appointmentRouter)
-
+app.use("/api/v1/call-requests", callRequestRouter)
 
 export { app }

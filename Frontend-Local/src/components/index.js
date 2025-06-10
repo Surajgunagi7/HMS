@@ -1,7 +1,6 @@
 import LoginComponent from './LoginComponent.jsx'
 import Appointments from './DoctorComponents/Appointments.jsx'
 import DoctorProfile from './DoctorComponents/DoctorProfile.jsx'
-import Prescriptions from './DoctorComponents/Prescriptions.jsx'
 import AddDoctor from './AdminComponent/ManageDoctor/AddDoctor.jsx'
 import UpdateDoctor from './AdminComponent/ManageDoctor/UpdateDoctor.jsx'
 import RemoveDoctor from './AdminComponent/ManageDoctor/RemoveDoctor.jsx'
@@ -12,7 +11,7 @@ import AddReceptionist from './AdminComponent/ManageReceptionist/AddReceptionist
 import UpdateReceptionist from './AdminComponent/ManageReceptionist/UpdateReceptionist.jsx'
 import RemoveReceptionist from './AdminComponent/ManageReceptionist/RemoveReceptionist.jsx'
 import ReceptionistAppointment from './ReceptionistComponents/ReceptionistAppointment.jsx'
-import SearchPatient from './ReceptionistComponents/SearchPatient.jsx'
+import PatientManager from './ReceptionistComponents/PatientManager.jsx'
 import CreateAppointment from './ReceptionistComponents/createAppointment.jsx'
 import RequestedCalls from './ReceptionistComponents/RequestedCalls.jsx'
 import StatCard from './AdminComponent/StatCard.jsx'
@@ -20,7 +19,6 @@ export {
     LoginComponent,
     Appointments,
     DoctorProfile,
-    Prescriptions,
     AddDoctor,
     UpdateDoctor,
     RemoveDoctor,
@@ -31,7 +29,7 @@ export {
     UpdateReceptionist,
     RemoveReceptionist,
     ReceptionistAppointment,
-    SearchPatient,
+    PatientManager,
     CreateAppointment,
     RequestedCalls,
     StatCard

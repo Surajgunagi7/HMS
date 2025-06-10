@@ -19,11 +19,10 @@ import {
 import {
   ReceptionistAppointment,
   CreateAppointment,
-  SearchPatient,
   RequestedCalls,
   Appointments,
   DoctorProfile,
-  Prescriptions
+  PatientManager
 } from "./components";
 
 function App() {
@@ -76,7 +75,6 @@ function App() {
           <Route index element={<Appointments />} />
           <Route path="appointments" element={<Appointments />} />
           <Route path="profile" element={<DoctorProfile />} />
-          <Route path="prescriptions" element={<Prescriptions />} />
         </Route>
         
         {/* Receptionist Dashboard with Nested Routes */}
@@ -84,8 +82,8 @@ function App() {
           <Route index element={<ReceptionistAppointment />} />
           <Route path="manage-appointments" element={<ReceptionistAppointment />} />
           <Route path="create-appointment" element={<CreateAppointment />} />
-          <Route path="search-patient" element={<SearchPatient />} />
           <Route path="requested-calls" element={<RequestedCalls />} />
+          <Route path="patient-management" element={<PatientManager />} />
         </Route>
 
         {/* Redirect all unknown routes to home page or login */}

@@ -62,11 +62,11 @@ const ReceptionistDashboard = () => {
               <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
             </Link>
             <Link 
-              to="/receptionist-dashboard/search-patient" 
+              to="/receptionist-dashboard/patient-management" 
               className="flex items-center gap-2 text-gray-600 hover:text-blue-600 hover:scale-105 transform transition-all duration-200 ease-out group relative"
             >
               <Search size={20} className="group-hover:rotate-12 transition-transform duration-200" />
-              <span>Search Patient</span>
+              <span>Manage Patient</span>
               <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
             </Link>
             <Link 
