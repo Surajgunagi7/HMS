@@ -11,7 +11,7 @@ const ManageDoc = () => {
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-bold">Manage Doctors</h2>
         <button
-          onClick={() => navigate("/admin-dashboard")} // Navigate back to Admin Dashboard
+          onClick={() => navigate("/admin-dashboard")} 
           className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
         >
           Back to Dashboard
