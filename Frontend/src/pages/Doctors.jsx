@@ -147,7 +147,7 @@ const Doctors = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredDoctors.map((doctor) => (
               <div
-                key={doctor.id}
+                key={doctor._id}
                 className="group relative card-liquid"
               >
                 <div className="liquid-glass-blue rounded-2xl overflow-hidden smooth-hover">

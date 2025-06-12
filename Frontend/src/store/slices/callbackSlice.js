@@ -1,23 +1,16 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import {service} from '../../service/apiCallService';
 
-// Async thunk for requesting callback
 export const requestCallback = createAsyncThunk(
   'callbacks/requestCallback',
   async (callbackData, { rejectWithValue }) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('Callback data:', callbackData);
       
-      // In real app, make API call here
-      // const response = await axios.post('/api/callbacks', callbackData);
-      // return response.data;
+      const response = await service.createRequestCall(callbackData);
+      return response.data;
       
-      return {
-        id: Date.now(),
-        ...callbackData,
-        status: 'pending',
-        createdAt: new Date().toISOString()
-      };
     } catch (error) {
       return rejectWithValue(error.message);
     }

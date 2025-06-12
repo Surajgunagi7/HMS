@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
 import { Phone, User, Mail, FileText, CheckCircle, AlertCircle, Clock, X } from 'lucide-react';
 import { requestCallback, clearCallbackMessages } from '../store/slices/callbackSlice';
-import LoadingSpinner from '../components/UI/LoadingSpinner';
 
 const RequestCall = () => {
   const dispatch = useDispatch();
@@ -66,7 +65,7 @@ const RequestCall = () => {
                 </h1>
                 
                 <p className="text-gray-600 mb-8">
-                  We'll get back to you shortly. Our team will contact you within 24 hours during business hours.
+                  We&apos;ll get back to you shortly. Our team will contact you within 24 hours during business hours.
                 </p>
                 
                 <div className="liquid-glass-blue rounded-2xl p-6 mb-8">
@@ -120,9 +119,9 @@ const RequestCall = () => {
                     <Phone className="h-4 w-4 mr-2" />
                     Request a Callback
                   </div>
-                  <h1 className="text-4xl font-bold mb-4">We'll Call You Back</h1>
+                  <h1 className="text-4xl font-bold mb-4">We&apos;ll Call You Back</h1>
                   <p className="text-xl text-cyan-100">
-                    Can't find time to call? Let us call you back at your convenience
+                    Can&apos;t find time to call? Let us call you back at your convenience
                   </p>
                 </div>
               </div>
@@ -261,7 +260,7 @@ const RequestCall = () => {
                     <div className="liquid-glass rounded-2xl p-6 bg-gradient-to-br from-red-50/50 to-orange-50/50">
                       <h3 className="text-lg font-semibold text-red-900 mb-4">Emergency?</h3>
                       <p className="text-sm text-red-800 mb-4">
-                        If this is a medical emergency, please don't wait for a callback.
+                        If this is a medical emergency, please don&apos;t wait for a callback.
                       </p>
                       <a
                         href="tel:911"

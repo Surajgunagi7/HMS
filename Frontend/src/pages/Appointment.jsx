@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm } from 'react-hook-form';
-import { Calendar, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Calendar, Clock, User, Phone, Mail, FileText, CheckCircle, AlertCircle, X,BookUser } from 'lucide-react';
 import { bookAppointment, clearAppointmentMessages } from '../store/slices/appointmentSlice';
 import { fetchDoctors } from '../store/slices/doctorSlice';
-import LoadingSpinner from '../components/UI/LoadingSpinner';
 
 const Appointment = () => {
   const dispatch = useDispatch();
@@ -38,7 +37,7 @@ const Appointment = () => {
 
   useEffect(() => {
     if (selectedDoctor) {
-      setValue('doctor', selectedDoctor.id);
+      setValue('doctor', selectedDoctor._id);
     }
   }, [selectedDoctor, setValue]);
 
@@ -50,13 +49,21 @@ const Appointment = () => {
   }, [successMessage, reset]);
 
   const onSubmit = (data) => {
-    const selectedDoc = doctors.find(d => d.id === parseInt(data.doctor));
+    const selectedDoc = doctors.find(d => d._id === data.doctor);
     const appointmentData = {
-      ...data,
-      doctor: selectedDoc ? selectedDoc.name : '',
-      doctorId: data.doctor,
+      name: data.name,
+      email: data.email,
+      phone: data.phone,
+      age: data.age,
+      doctor: data.doctor,
+      date: data.date,
+      time: data.time,
+      reason: data.reason,
+      doctorName: selectedDoc ? selectedDoc.name : '',
     };
+    
     dispatch(bookAppointment(appointmentData));
+    
   };
 
   const closeModal = () => {
@@ -89,7 +96,7 @@ const Appointment = () => {
                 </h1>
                 
                 <p className="text-gray-600 mb-8">
-                  Your appointment has been successfully booked. We'll send you a confirmation email shortly.
+                  Your appointment has been successfully booked. We&apos;ll send you a confirmation email shortly.
                 </p>
                 
                 <div className="liquid-glass-blue rounded-2xl p-6 mb-8 text-left">
@@ -101,7 +108,7 @@ const Appointment = () => {
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-gray-700">Doctor:</span>
-                      <span className="text-gray-900">{currentAppointment.doctor}</span>
+                      <span className="text-gray-900">{currentAppointment.doctorName}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="font-medium text-gray-700">Date:</span>
@@ -228,7 +235,29 @@ const Appointment = () => {
                             )}
                           </div>
                         </div>
-
+                        
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                            <div>
+                            <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
+                              <BookUser className="h-4 w-4 mr-2" />
+                              Age
+                            </label>
+                            <input
+                              type="number"
+                              {...register('age', { 
+                                required: 'Age is required',
+                                pattern: {
+                                  value: /^[0-9+\-\s()]+$/,
+                                  message: 'Please enter a valid Age'
+                                }
+                              })}
+                              className="w-full px-4 py-3 input-liquid rounded-xl"
+                              placeholder="Enter your Age"
+                            />
+                            {errors.age && (
+                              <p className="mt-1 text-sm text-red-600">{errors.age.message}</p>
+                            )}
+                        </div>
                         <div>
                           <label className="flex items-center text-sm font-medium text-gray-700 mb-2">
                             <Mail className="h-4 w-4 mr-2" />
@@ -250,7 +279,7 @@ const Appointment = () => {
                             <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
                           )}
                         </div>
-
+                        </div>
                         {/* Appointment Details */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
@@ -296,7 +325,7 @@ const Appointment = () => {
                           >
                             <option value="">Choose a doctor</option>
                             {doctors.map((doctor) => (
-                              <option key={doctor.id} value={doctor.id}>
+                              <option key={doctor._id} value={doctor._id}>
                                 {doctor.name} - {doctor.specialization}
                               </option>
                             ))}

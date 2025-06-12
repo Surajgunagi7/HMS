@@ -1,16 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-
-// Async thunk for booking appointment
+import {service} from '../../service/apiCallService.js'
 export const bookAppointment = createAsyncThunk(
   'appointments/bookAppointment',
   async (appointmentData, { rejectWithValue }) => {
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // In real app, make API call here
-      // const response = await axios.post('/api/appointments', appointmentData);
-      // return response.data;
+      const PatientData = {
+          name: appointmentData.name,
+          age: appointmentData.age,
+          email: appointmentData.email,
+          phone: appointmentData.phone,
+      }
+      const patientResponse = await service.createOrFindPatient(PatientData)
+      const patientId = patientResponse.data.data._id;
+      const appointmentPayload = {
+          patient: patientId,
+          doctor: appointmentData.doctor,
+          reason: appointmentData.reason,
+          dateTime: `${appointmentData.date}T${appointmentData.time}:00.000Z`,
+          status: "pending",
+          paymentStatus: "pending"
+        };
+      const response = await service.createAppointment(appointmentPayload);
+      console.log('Booking appointment with data:', response.data);
       
       return {
         id: Date.now(),

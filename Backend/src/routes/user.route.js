@@ -20,6 +20,6 @@ router.post("/refresh-token",refreshAccessToken)
 router.patch("/update", verifyJWT,updateAccountDetails);
 router.get("/profile", verifyJWT,getUserProfile);
 router.delete("/delete/:loginId",verifyJWT, deleteUser);
-router.get("/get-users-by-role/:role",verifyJWT, getUsersByRole);
+router.get("/get-users-by-role/:role", getUsersByRole);
 
 export default router;

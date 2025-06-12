@@ -9,11 +9,9 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.use(verifyJWT);
-
 router.post("/create", createAppointment);
-router.get("/get-appointments", getAppointments);
-router.put("/update-appointments/:id", updateAppointment);
-router.delete("/delete-appointments/:id", deleteAppointment);
+router.get("/get-appointments",verifyJWT, getAppointments);
+router.put("/update-appointments/:id",verifyJWT, updateAppointment);
+router.delete("/delete-appointments/:id",verifyJWT, deleteAppointment);
 
 export default router;
