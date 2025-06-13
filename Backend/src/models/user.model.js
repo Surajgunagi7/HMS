@@ -2,6 +2,7 @@ import mongoose, {Schema} from "mongoose";
 import bcrypt from 'bcryptjs'
 import validator from 'validator'
 import jwt from 'jsonwebtoken'
+import { type } from "os";
 
 const userSchema = new Schema(
     {
@@ -37,9 +38,6 @@ const userSchema = new Schema(
                 education: {
                     type: String
                 },
-                description: {
-                    type: String
-                },
             },{_id: false})
         },
         specialization: {
@@ -47,6 +45,18 @@ const userSchema = new Schema(
         },
         phone: {
             type: String
+        },
+        profilePicture: {
+            type: String,
+            default: "https://res.cloudinary.com/dl96cbqkg/image/upload/v1749824775/default_lkmhfk.jpg"
+        },
+        consultationFee: {
+            type: Number,
+            default: 0
+        },
+        available: {
+            type: Boolean,
+            default: true
         },
         refreshToken: {
             type: String

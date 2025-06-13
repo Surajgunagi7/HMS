@@ -7,6 +7,7 @@ export const fetchDoctors = createAsyncThunk(
     try {
       const response = await service.getDoctorList();
       return response.data;
+      
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -57,7 +58,6 @@ const doctorSlice = createSlice({
   },
 });
 
-// Helper function to filter doctors
 const filterDoctors = (doctors, searchTerm, specialization) => {
   return doctors.filter(doctor => {
     const matchesSearch = doctor.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

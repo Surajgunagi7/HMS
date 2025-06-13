@@ -377,14 +377,14 @@ const Appointment = () => {
                         <h3 className="text-lg font-semibold text-gray-900 mb-4">Selected Doctor</h3>
                         <div className="flex items-center space-x-4">
                           <img
-                            src={selectedDoctor.image}
+                            src={selectedDoctor.profilePicture}
                             alt={selectedDoctor.name}
                             className="h-16 w-16 rounded-full object-cover ring-2 ring-white/50"
                           />
                           <div>
                             <p className="font-semibold text-gray-900">{selectedDoctor.name}</p>
                             <p className="text-blue-600">{selectedDoctor.specialization}</p>
-                            <p className="text-sm text-gray-500">{selectedDoctor.experience}</p>
+                            <p className="text-sm text-gray-500">{selectedDoctor.about?.experience} Years</p>
                           </div>
                         </div>
                       </div>

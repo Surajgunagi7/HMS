@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Search, Filter, Star, Calendar, MapPin, X, Phone, Mail, Award, Clock, Users } from 'lucide-react';
+import { Search, Filter, Calendar, MapPin, X, Phone, Mail, Award, Clock, Users } from 'lucide-react';
 import { fetchDoctors, setSearchTerm, setSelectedSpecialization } from '../store/slices/doctorSlice';
 import { setSelectedDoctor } from '../store/slices/appointmentSlice';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
@@ -20,7 +20,7 @@ const Doctors = () => {
   const [selectedDoctorDetail, setSelectedDoctorDetail] = useState(null);
 
   useEffect(() => {
-    dispatch(fetchDoctors());
+    dispatch(fetchDoctors());        
   }, [dispatch]);
 
   const handleBookAppointment = (doctor) => {
@@ -125,6 +125,7 @@ const Doctors = () => {
         </div>
 
         {/* Doctors Grid */}
+        {console.log(filteredDoctors)}
         {filteredDoctors.length === 0 ? (
           <div className="text-center py-16">
             <div className="liquid-glass-popup p-12 rounded-2xl max-w-md mx-auto">
@@ -144,6 +145,7 @@ const Doctors = () => {
             </div>
           </div>
         ) : (
+          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredDoctors.map((doctor) => (
               <div
@@ -153,15 +155,11 @@ const Doctors = () => {
                 <div className="liquid-glass-blue rounded-2xl overflow-hidden smooth-hover">
                   <div className="relative overflow-hidden">
                     <img
-                      src={doctor.image}
+                      src={doctor.profilePicture}
                       alt={doctor.name}
                       className="w-full h-64 object-cover smooth-transition group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 smooth-transition"></div>
-                    <div className="absolute top-4 right-4 liquid-glass px-3 py-1 rounded-full flex items-center space-x-1">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium text-white">{doctor.rating}</span>
-                    </div>
                     <button
                       onClick={() => setSelectedDoctorDetail(doctor)}
                       className="absolute bottom-4 left-4 right-4 liquid-glass text-white py-2 px-4 rounded-lg opacity-0 group-hover:opacity-100 smooth-transition hover:bg-white/30 font-medium"
@@ -177,16 +175,16 @@ const Doctors = () => {
                     <p className="text-blue-600 font-semibold mb-2">{doctor.specialization}</p>
                     <p className="text-gray-600 text-sm mb-4 flex items-center">
                       <Award className="h-4 w-4 mr-1" />
-                      {doctor.experience} Experience
+                      {doctor.about?.experience} Years Experience
                     </p>
                     
                     <div className="flex items-center text-sm text-gray-500 mb-6">
                       <MapPin className="h-4 w-4 mr-1" />
-                      <span>{doctor.availability}</span>
+                      <span>{doctor.available === true ? "Available" : "Not Available"}</span>
                     </div>
                     
                     <div className="flex items-center justify-between">
-                      <span className="text-2xl font-bold text-gray-900">{doctor.consultationFee}</span>
+                      <span className="text-2xl font-bold text-gray-900">&#8377;{doctor.consultationFee}</span>
                       <Link
                         to="/appointment"
                         onClick={() => handleBookAppointment(doctor)}
@@ -218,7 +216,7 @@ const Doctors = () => {
               {/* Header */}
               <div className="relative h-64 overflow-hidden rounded-t-3xl">
                 <img
-                  src={selectedDoctorDetail.image}
+                  src={selectedDoctorDetail.profilePicture}
                   alt={selectedDoctorDetail.name}
                   className="w-full h-full object-cover"
                 />
@@ -231,12 +229,8 @@ const Doctors = () => {
                 </button>
                 <div className="absolute bottom-6 left-6 right-6">
                   <div className="flex items-center space-x-4 mb-4">
-                    <div className="liquid-glass px-3 py-1 rounded-full flex items-center space-x-1">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                      <span className="text-sm font-medium text-white">{selectedDoctorDetail.rating}</span>
-                    </div>
                     <div className="liquid-glass px-3 py-1 rounded-full">
-                      <span className="text-sm font-medium text-white">{selectedDoctorDetail.availability}</span>
+                      <span className="text-sm font-medium text-white">{selectedDoctorDetail.available === true ? "Available" : "Not Available"}</span>
                     </div>
                   </div>
                   <h2 className="text-3xl font-bold text-white mb-2">{selectedDoctorDetail.name}</h2>
@@ -252,7 +246,7 @@ const Doctors = () => {
                     <div>
                       <h3 className="text-xl font-bold text-gray-900 mb-4">About Dr. {selectedDoctorDetail.name.split(' ').pop()}</h3>
                       <p className="text-gray-600 leading-relaxed">
-                        Dr. {selectedDoctorDetail.name.split(' ').pop()} is a highly experienced {selectedDoctorDetail.specialization.toLowerCase()} specialist with {selectedDoctorDetail.experience} of dedicated service in the medical field. Known for providing compassionate care and utilizing the latest medical technologies to ensure the best outcomes for patients.
+                        Dr. {selectedDoctorDetail.name.split(' ').pop()} is a highly experienced {selectedDoctorDetail.specialization.toLowerCase()} specialist with {selectedDoctorDetail.about?.experience} Years of dedicated service in the medical field. Known for providing compassionate care and utilizing the latest medical technologies to ensure the best outcomes for patients.
                       </p>
                     </div>
 
@@ -266,7 +260,7 @@ const Doctors = () => {
                             </div>
                             <div>
                               <p className="font-semibold text-gray-900">Experience</p>
-                              <p className="text-sm text-gray-600">{selectedDoctorDetail.experience}</p>
+                              <p className="text-sm text-gray-600">{selectedDoctorDetail.about?.experience} Years</p>
                             </div>
                           </div>
                         </div>
@@ -303,7 +297,7 @@ const Doctors = () => {
                     <div className="liquid-glass-blue p-6 rounded-2xl">
                       <h3 className="text-lg font-bold text-gray-900 mb-4">Consultation Fee</h3>
                       <div className="text-center">
-                        <div className="text-3xl font-bold text-blue-600 mb-2">{selectedDoctorDetail.consultationFee}</div>
+                        <div className="text-3xl font-bold text-blue-600 mb-2">&#8377;{selectedDoctorDetail.consultationFee}</div>
                         <p className="text-sm text-gray-600">Per consultation</p>
                       </div>
                     </div>
@@ -316,21 +310,21 @@ const Doctors = () => {
                           <Phone className="h-5 w-5 text-blue-500" />
                           <div>
                             <p className="font-medium text-gray-900">Phone</p>
-                            <p className="text-sm text-gray-600">+1 (555) 123-4567</p>
+                            <p className="text-sm text-gray-600">{selectedDoctorDetail.phone}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
                           <Mail className="h-5 w-5 text-blue-500" />
                           <div>
                             <p className="font-medium text-gray-900">Email</p>
-                            <p className="text-sm text-gray-600">doctor@medicare.com</p>
+                            <p className="text-sm text-gray-600">{selectedDoctorDetail.email}</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">
                           <Clock className="h-5 w-5 text-blue-500" />
                           <div>
                             <p className="font-medium text-gray-900">Availability</p>
-                            <p className="text-sm text-gray-600">{selectedDoctorDetail.availability}</p>
+                            <p className="text-sm text-gray-600">{selectedDoctorDetail.available === true ? "Available" : "Not Available"}</p>
                           </div>
                         </div>
                       </div>

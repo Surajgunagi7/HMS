@@ -4,7 +4,7 @@ import {ApiResponse} from '../utils/ApiResponse.js'
 import  { User } from  '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto';
-
+import {uploadOnCloudinary} from '../utils/cloudinary.js'
 const generateAccessAndRefreshTokens = async(userId) => {
     try {
         const user = await User.findById(userId)
@@ -39,7 +39,7 @@ const generateId = (role) => {
 
 const registerUser = asyncHandler( async (req, res) => {
     
-    const {name, email, password, role, phone, specialization, about} = req.body;
+    const {name, email, password, role, phone, specialization, about, consultationFee, available} = req.body;
 
     if([name, email, password, role, phone, specialization].some((field) => field?.trim() === "" )) {
         throw new ApiError(400, "All fields are required");
@@ -70,6 +70,20 @@ const registerUser = asyncHandler( async (req, res) => {
     if (role === "doctor") {
         userData.specialization = specialization;
         userData.about = about;
+        userData.available = available ?? true;
+        userData.consultationFee = consultationFee ?? 0;
+        
+        const doctorProfilePath = req.file?.path
+        if(!doctorProfilePath) {
+            throw new ApiError(400, "DoctorProfile File is Missing");
+        }
+        const doctorProfile = await uploadOnCloudinary(doctorProfilePath);
+        
+        if(!doctorProfile.url) {
+            throw new ApiError(400, "Error while uploading on Doctor Profile");
+        }
+
+        userData.profilePicture = doctorProfile.url; 
     }
 
     const user = await User.create(userData);
@@ -179,7 +193,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             secure: true
         }
     
-        const  {accessToken, newRefreshToken }= await generateAccessAndRefreshTokens(user._id);
+        const  {accessToken, newRefreshToken } = await generateAccessAndRefreshTokens(user._id);
     
         return res
         .status(200)
