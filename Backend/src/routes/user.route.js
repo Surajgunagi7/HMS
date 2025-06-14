@@ -8,7 +8,8 @@ import {
     updateAccountDetails,
     getUserProfile, 
     deleteUser,
-    getUsersByRole     
+    getUsersByRole,
+    updateDoctorWithImage     
 } from "../controllers/user.controller.js";
 import {verifyJWT} from '../middlewares/auth.middleware.js'
 const router = Router();
@@ -20,7 +21,8 @@ router.post("/login", loginUser);
 router.post("/logout", verifyJWT,logoutUser);
 router.post("/refresh-token",refreshAccessToken)
 router.patch("/update", verifyJWT,updateAccountDetails);
-router.get("/profile", verifyJWT,getUserProfile);
+router.patch("/update-with-image",verifyJWT, upload.single("profilePicture"), updateDoctorWithImage);
+router.get("/profile",upload.single("profilePicture"), verifyJWT,getUserProfile);
 router.delete("/delete/:loginId",verifyJWT, deleteUser);
 router.get("/get-users-by-role/:role", getUsersByRole);
 

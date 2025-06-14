@@ -39,7 +39,7 @@ const generateId = (role) => {
 
 const registerUser = asyncHandler( async (req, res) => {
     
-    const {name, email, password, role, phone, specialization, about, consultationFee, available} = req.body;
+    const {name, email, password, role, phone, specialization, experience, education, consultationFee, available} = req.body;
 
     if([name, email, password, role, phone, specialization].some((field) => field?.trim() === "" )) {
         throw new ApiError(400, "All fields are required");
@@ -69,8 +69,11 @@ const registerUser = asyncHandler( async (req, res) => {
     };
     if (role === "doctor") {
         userData.specialization = specialization;
-        userData.about = about;
-        userData.available = available ?? true;
+        userData.about = {
+            experience: experience ?? 0,
+            education: education ?? "",
+        };
+        userData.available = available ?? false;
         userData.consultationFee = consultationFee ?? 0;
         
         const doctorProfilePath = req.file?.path
@@ -212,9 +215,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 })
 
 const updateAccountDetails = asyncHandler(async (req, res) => {
-    const {name, email, role, specialization, phone, _id, about } = req.body
-    if([name, email, role, phone, specialization].some((field) => field?.trim() === "" )) {
-        throw new ApiError(400, "All fields are required")
+    const { name, email, role, specialization, phone, _id, about, available, consultationFee } = req.body;
+
+    if ([name, email, role, phone, specialization].some((field) => field?.trim() === "")) {
+        throw new ApiError(400, "All fields are required");
     }
 
     const updateFields = {
@@ -224,24 +228,30 @@ const updateAccountDetails = asyncHandler(async (req, res) => {
         phone,
     };
 
+    if (consultationFee !== undefined) {
+        updateFields.consultationFee = consultationFee;
+    }
+
+    if (available !== undefined) {
+        updateFields.available = available;
+    }
+
     if (about && typeof about === 'object') {
         updateFields.about = {
             experience: about.experience,
             education: about.education,
-            description: about.description
+            description: about.description,
         };
     }
-    
+
     const user = await User.findByIdAndUpdate(
         _id,
         { $set: updateFields },
         { new: true }
     ).select("-password -refreshToken");
 
-    return res
-    .status(200)
-    .json(new ApiResponse(200, user, "Account details Updated"))
-})
+    return res.status(200).json(new ApiResponse(200, user, "Account details updated"));
+});
 
 const getUserProfile = asyncHandler(async (req, res) => {
 
@@ -298,6 +308,90 @@ const getUsersByRole = asyncHandler(async (req, res) => {
     }
 });
 
+const updateDoctorWithImage = asyncHandler(async (req, res) => {
+    try {
+        const { _id, name, email, role, phone, specialization, consultationFee, about } = req.body;
+        
+        // Validate required fields
+        if (!_id) {
+            throw new ApiError(400, "Doctor ID is required");
+        }
+
+        // Find the doctor
+        const doctor = await User.findById(_id);
+        if (!doctor) {
+            throw new ApiError(404, "Doctor not found");
+        }
+
+        // Parse the about field if it's a string (from FormData)
+        let parsedAbout = about;
+        if (typeof about === 'string') {
+            try {
+                parsedAbout = JSON.parse(about);
+            } catch (error) {
+                throw new ApiError(400, "Invalid about data format");
+            }
+        }
+
+        const updateData = {
+            name: name || doctor.name,
+            email: email || doctor.email,
+            role: role || doctor.role,
+            phone: phone || doctor.phone,
+            specialization: specialization || doctor.specialization,
+            consultationFee: consultationFee ? parseFloat(consultationFee) : doctor.consultationFee,
+            about: parsedAbout || doctor.about
+        };
+
+        if (req.file) {
+            console.log("File received:", req.file);
+            
+            const profilePictureUpload = await uploadOnCloudinary(req.file.path);
+            
+            if (!profilePictureUpload) {
+                throw new ApiError(500, "Failed to upload profile picture");
+            }
+            
+            updateData.profilePicture = profilePictureUpload.secure_url;
+            console.log("Profile picture uploaded:", profilePictureUpload.secure_url);
+        }
+
+        const updatedDoctor = await User.findByIdAndUpdate(
+            _id,
+            updateData,
+            { 
+                new: true, 
+                runValidators: true 
+            }
+        ).select("-password -refreshToken");
+
+        if (!updatedDoctor) {
+            throw new ApiError(500, "Failed to update doctor profile");
+        }
+
+        console.log("Doctor updated successfully:", updatedDoctor._id);
+
+        return res.status(200).json(
+            new ApiResponse(200, updatedDoctor, "Doctor profile updated successfully")
+        );
+
+    } catch (error) {
+        console.error("Error in updateDoctorWithImage:", error);
+        
+        if (error.name === 'ValidationError') {
+            const validationErrors = Object.values(error.errors).map(err => err.message);
+            throw new ApiError(400, `Validation Error: ${validationErrors.join(', ')}`);
+        }
+        
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyPattern)[0];
+            throw new ApiError(400, `${field} already exists`);
+        }
+        
+        throw error;
+    }
+});
+
 /* TODO
 forgotPassword
 resetPassword
@@ -310,5 +404,6 @@ export {
     updateAccountDetails,
     getUserProfile,
     deleteUser,
-    getUsersByRole
+    getUsersByRole,
+    updateDoctorWithImage
 }

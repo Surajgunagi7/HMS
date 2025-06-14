@@ -84,23 +84,6 @@ const getAllPatients = asyncHandler(async (req, res) => {
     );
 });
   
-// const getPatientById = asyncHandler(async (req, res) => {
-//     const { id } = req.params;
-  
-//     const patient = await Patient.findById(id).select("-__v");
-  
-//     if (!patient) {
-//       throw new ApiError(404, "Patient not found.");
-//     }
-  
-//     res.status(200).json(
-//       new ApiResponse(200, {
-//         success: true,
-//         data: patient,
-//       }, "Patient fetched successfully")
-//     );
-// });
-  
 const updatePatient = asyncHandler(async (req, res) => {
     const { id } = req.params;
   
@@ -140,11 +123,35 @@ const deletePatient = asyncHandler(async (req, res) => {
     );
 });
 
+const addVisitToPatient = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const visitData = req.body;
   
+  if (!visitData.visitType || !visitData.amount) {
+    throw new ApiError(400, "Visit type and amount are required");
+  }
+
+  const patient = await Patient.findById(id);
+  if (!patient) {
+    throw new ApiError(404, "Patient not found");
+  }
+
+  patient.visits.push(visitData);
+  await patient.save();
+  res.status(200).json(
+    new ApiResponse(200, {
+      success: true,
+      data: patient,
+    }, "Visit added successfully")
+  );
+});
+
+
 export { 
     createOrFindPatient,
     searchPatient,
     getAllPatients,
     updatePatient,
-    deletePatient
+    deletePatient,
+    addVisitToPatient,
 };
