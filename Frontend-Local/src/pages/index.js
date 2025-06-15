@@ -8,7 +8,7 @@ import ManageDoc from './AdminLayout/ManageDoc.jsx'
 import ManageAdmin from './AdminLayout/ManageAdmin.jsx'
 import ManageReceptionist  from './AdminLayout/ManageReceptionist.jsx'
 import ReceptionistDashboard from './ReceptionistLayout/ReceptionistDashboard.jsx'
-import Sales from './AdminLayout/Sales.jsx'
+import Revenue from './AdminLayout/Revenue.jsx'
 import ActivityRecords from './AdminLayout/ActivityRecords.jsx'
 
 export {
@@ -22,6 +22,6 @@ export {
     ManageAdmin,
     ManageReceptionist,
     ReceptionistDashboard,
-    Sales,
+    Revenue,
     ActivityRecords
 }

@@ -12,7 +12,7 @@ import {
   ManageAdmin,
   ManageReceptionist,
   ReceptionistDashboard,
-  Sales,
+  Revenue,
   ActivityRecords
   
 } from "./pages";
@@ -63,11 +63,11 @@ function App() {
 
         {/* Protected Dashboard Pages */}
         <Route path="/admin-dashboard" element={<AdminDashboard />} >
-          <Route index element={<Sales />} />
+          <Route index element={<ActivityRecords />} />
           <Route path="manage-doctors" element={<ManageDoc />} />
           <Route path="manage-admins" element={<ManageAdmin />} />
           <Route path="manage-receptionists" element={<ManageReceptionist />} />
-          <Route path="sales" element={<Sales />} />
+          <Route path="sales" element={<Revenue />} />
           <Route path="activity" element={<ActivityRecords />} />
         </Route>
         

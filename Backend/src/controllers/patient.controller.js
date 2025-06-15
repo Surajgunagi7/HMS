@@ -146,6 +146,159 @@ const addVisitToPatient = asyncHandler(async (req, res) => {
   );
 });
 
+// New method to get patient visits with payment details
+const getPatientVisits = asyncHandler(async (req, res) => {
+  const { patientId } = req.params;
+
+  const patient = await Patient.findById(patientId).select('visits name phone');
+  
+  if (!patient) {
+    throw new ApiError(404, "Patient not found");
+  }
+
+  res.status(200).json(
+    new ApiResponse(200, {
+      success: true,
+      data: {
+        patient: {
+          name: patient.name,
+          phone: patient.phone
+        },
+        visits: patient.visits
+      },
+    }, "Patient visits fetched successfully")
+  );
+});
+
+// New method to update visit payment
+const updateVisitPayment = asyncHandler(async (req, res) => {
+  const { patientId, visitId } = req.params;
+  const { amountPaid, paymentMethod, paymentDate, notes } = req.body;
+
+  const patient = await Patient.findById(patientId);
+  
+  if (!patient) {
+    throw new ApiError(404, "Patient not found");
+  }
+
+  const visit = patient.visits.id(visitId);
+  
+  if (!visit) {
+    throw new ApiError(404, "Visit not found");
+  }
+
+  // Update payment details
+  visit.amountPaid = amountPaid || visit.amountPaid;
+  visit.paymentMethod = paymentMethod || visit.paymentMethod;
+  visit.paymentDate = paymentDate || visit.paymentDate;
+  visit.notes = notes || visit.notes;
+
+  // Calculate pending amount
+  visit.pendingAmount = visit.amount - visit.amountPaid;
+  visit.paymentStatus = visit.pendingAmount <= 0 ? 'completed' : 'partial';
+
+  await patient.save();
+
+  res.status(200).json(
+    new ApiResponse(200, {
+      success: true,
+      data: visit,
+    }, "Visit payment updated successfully")
+  );
+});
+
+// New method to get pending payments for a patient
+const getPendingPayments = asyncHandler(async (req, res) => {
+  const { patientId } = req.params;
+
+  const patient = await Patient.findById(patientId).select('visits name phone');
+  
+  if (!patient) {
+    throw new ApiError(404, "Patient not found");
+  }
+
+  // Filter visits with pending payments
+  const pendingVisits = patient.visits.filter(visit => 
+    visit.paymentStatus === 'pending' || visit.paymentStatus === 'partial'
+  );
+
+  const totalPending = pendingVisits.reduce((sum, visit) => 
+    sum + (visit.pendingAmount || visit.amount), 0
+  );
+
+  res.status(200).json(
+    new ApiResponse(200, {
+      success: true,
+      data: {
+        patient: {
+          name: patient.name,
+          phone: patient.phone
+        },
+        pendingVisits,
+        totalPendingAmount: totalPending
+      },
+    }, "Pending payments fetched successfully")
+  );
+});
+
+// New method to record payment for pending amount
+const recordPayment = asyncHandler(async (req, res) => {
+  const { patientId, visitId } = req.params;
+  const { amountPaid, paymentMethod, paymentDate, notes } = req.body;
+
+  if (!amountPaid || amountPaid <= 0) {
+    throw new ApiError(400, "Valid payment amount is required");
+  }
+
+  const patient = await Patient.findById(patientId);
+  
+  if (!patient) {
+    throw new ApiError(404, "Patient not found");
+  }
+
+  const visit = patient.visits.id(visitId);
+  
+  if (!visit) {
+    throw new ApiError(404, "Visit not found");
+  }
+
+  // Calculate new amounts
+  const currentPaid = visit.amountPaid || 0;
+  const newAmountPaid = currentPaid + parseFloat(amountPaid);
+  
+  if (newAmountPaid > visit.amount) {
+    throw new ApiError(400, "Payment amount exceeds the total visit amount");
+  }
+
+  // Update payment details
+  visit.amountPaid = newAmountPaid;
+  visit.pendingAmount = visit.amount - newAmountPaid;
+  visit.paymentMethod = paymentMethod || visit.paymentMethod;
+  visit.paymentDate = paymentDate || new Date();
+  visit.notes = notes || visit.notes;
+
+  // Update payment status
+  if (visit.pendingAmount <= 0) {
+    visit.paymentStatus = 'paid';
+  } else if (visit.amountPaid > 0) {
+    visit.paymentStatus = 'partial';
+  }
+
+  await patient.save();
+
+  res.status(200).json(
+    new ApiResponse(200, {
+      success: true,
+      data: {
+        visit,
+        paymentRecorded: amountPaid,
+        totalPaid: newAmountPaid,
+        remainingAmount: visit.pendingAmount
+      },
+    }, "Payment recorded successfully")
+  );
+});
+
 
 export { 
     createOrFindPatient,
@@ -154,4 +307,8 @@ export {
     updatePatient,
     deletePatient,
     addVisitToPatient,
+    getPatientVisits,
+    updateVisitPayment,
+    getPendingPayments,
+    recordPayment
 };

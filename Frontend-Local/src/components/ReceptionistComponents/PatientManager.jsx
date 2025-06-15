@@ -35,6 +35,16 @@ const PatientManager = () => {
   const [showVisitForm, setShowVisitForm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [pendingPayments, setPendingPayments] = useState([]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [selectedVisit, setSelectedVisit] = useState(null);
+  const [paymentForm, setPaymentForm] = useState({
+    amountPaid: '',
+    paymentMethod: 'cash',
+    paymentDate: new Date().toISOString().split('T')[0],
+    notes: ''
+  });
+
   const handleSearch = async () => {
     setIsLoading(true);
     try {
@@ -50,6 +60,9 @@ const PatientManager = () => {
             phone: data.emergencyContact?.phone || ''
           }
         });
+        
+        await fetchPendingPayments(data._id);
+        
         setNotFound(false);
         setShowRegisterForm(false);
         setEditMode(false);
@@ -61,6 +74,7 @@ const PatientManager = () => {
         setShowRegisterForm(true);
         setPatient(null);
         setFormData({ ...initialForm, phone });
+        setPendingPayments([]);
         toast.error('Patient not found. Please register them.');
       }
     } catch (err) {
@@ -160,6 +174,77 @@ const PatientManager = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const fetchPendingPayments = async (patientId) => {
+    try {
+      const response = await patientService.getPendingPayments(patientId);
+      
+      if (response?.data?.data?.pendingVisits) {
+        setPendingPayments(response.data.data.pendingVisits);
+      } else {
+        setPendingPayments([]);
+      }
+    } catch (err) {
+      console.error('Error fetching pending payments:', err);
+      setPendingPayments([]);
+      toast.error('Failed to fetch pending payments');
+    }
+  };
+
+  const handlePaymentFormChange = (e) => {
+    const { name, value } = e.target;
+    setPaymentForm(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleRecordPayment = async () => {
+    if (!paymentForm.amountPaid || parseFloat(paymentForm.amountPaid) <= 0) {
+      toast.error('Please enter a valid payment amount');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await patientService.recordPayment(
+        patient._id, 
+        selectedVisit._id, 
+        paymentForm
+      );
+      console.log("Payment response:", response);
+      
+      if (response?.data) {
+        // Refresh pending payments
+        await fetchPendingPayments(patient._id);
+        
+        // Reset form and close modal
+        setPaymentForm({
+          amountPaid: '',
+          paymentMethod: 'cash',
+          paymentDate: new Date().toISOString().split('T')[0],
+          notes: ''
+        });
+        setShowPaymentModal(false);
+        setSelectedVisit(null);
+        
+        toast.success('Payment recorded successfully!');
+      }
+    } catch (err) {
+      console.error('Error recording payment:', err);
+      toast.error('Failed to record payment');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const openPaymentModal = (visit) => {
+    setSelectedVisit(visit);
+    setPaymentForm({
+      amountPaid: '',
+      paymentMethod: 'cash',
+      paymentDate: new Date().toISOString().split('T')[0],
+      notes: ''
+    });
+    setShowPaymentModal(true);
   };
 
   return (
@@ -305,6 +390,79 @@ const PatientManager = () => {
             </GlassCard>
           )}
 
+          {/* Pending Payments Section */}
+          {patient && !editMode && !showVisitForm && pendingPayments && pendingPayments.length > 0 &&  (
+            <GlassCard className="mb-6 animate-fadeInUp animate-stagger-3" background="glass">
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center">
+                  <AlertCircle className="w-5 h-5 mr-2 text-red-600" />
+                  Pending Payments
+                </h3>
+              </div>
+              
+              <div className="space-y-4">
+                {pendingPayments.map((visit) => (
+                  <div key={visit._id} className="border border-red-200 rounded-lg p-4 bg-red-50">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-4 mb-2">
+                          <span className="font-medium text-gray-800">
+                            Visit Date: {new Date(visit.visitDate).toLocaleDateString()}
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            visit.paymentStatus === 'pending' 
+                              ? 'bg-red-100 text-red-800' 
+                              : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {visit.paymentStatus === 'pending' ? 'Payment Pending' : 'Partial Payment'}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600 mb-2">
+                          Visit Type: <span className="font-medium">{visit.visitType}</span>
+                        </div>
+                        {visit.notes && (
+                          <div className="text-sm text-gray-600 mb-2">
+                            Notes: <span className="font-medium">{visit.notes}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                      <div className="text-center p-2 bg-white rounded">
+                        <div className="text-xs text-gray-500">Total Amount</div>
+                        <div className="font-bold text-gray-800">₹{visit.amount}</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded">
+                        <div className="text-xs text-gray-500">Paid Amount</div>
+                        <div className="font-bold text-green-600">₹{visit.amountPaid || 0}</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded">
+                        <div className="text-xs text-gray-500">Pending Amount</div>
+                        <div className="font-bold text-red-600">₹{visit.pendingAmount || visit.amount}</div>
+                      </div>
+                      <div className="text-center p-2 bg-white rounded">
+                        <div className="text-xs text-gray-500">Payment Method</div>
+                        <div className="font-medium text-gray-700">{visit.paymentMethod || 'Not specified'}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex justify-end">
+                      <GlassButton
+                        onClick={() => openPaymentModal(visit)}
+                        variant="success"
+                        className="bg-green-500 text-white"
+                      >
+                        <Plus size={16} />
+                        Record Payment
+                      </GlassButton>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </GlassCard>
+          )}
+
           {/* Add Visit Form */}
           {showVisitForm && (
             <GlassCard className="mb-6 animate-fadeInUp animate-stagger-3" background="glass">
@@ -414,7 +572,114 @@ const PatientManager = () => {
             />
           )}
         </GlassCard>
+
+        {/* Payment Modal - Now properly placed outside the main card */}
+        {showPaymentModal && selectedVisit && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4">
+              <div className="mb-6">
+                <h3 className="text-xl font-semibold text-gray-800 mb-2 flex items-center">
+                  <Plus className="w-5 h-5 mr-2 text-green-600" />
+                  Record Payment
+                </h3>
+                <div className="text-sm text-gray-600">
+                  Visit Date: {new Date(selectedVisit.visitDate).toLocaleDateString()}
+                </div>
+                <div className="text-sm text-gray-600">
+                  Pending Amount: <span className="font-bold text-red-600">₹{selectedVisit.pendingAmount || selectedVisit.amount}</span>
+                </div>
+              </div>
+
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleRecordPayment();
+              }} className="space-y-4">
+                <GlassInput
+                  icon={Plus}
+                  label="Payment Amount (₹)"
+                  name="amountPaid"
+                  type="number"
+                  min="0"
+                  max={selectedVisit.pendingAmount || selectedVisit.amount}
+                  step="0.01"
+                  value={paymentForm.amountPaid}
+                  onChange={handlePaymentFormChange}
+                  placeholder="Enter payment amount"
+                  required
+                />
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Payment Method</label>
+                  <select
+                    name="paymentMethod"
+                    value={paymentForm.paymentMethod}
+                    onChange={handlePaymentFormChange}
+                    className="w-full px-4 py-3 input-glass rounded-xl border border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/80"
+                  >
+                    <option value="cash">Cash</option>
+                    <option value="card">Card</option>
+                    <option value="upi">UPI</option>
+                    <option value="netbanking">Net Banking</option>
+                    <option value="cheque">Cheque</option>
+                  </select>
+                </div>
+
+                <GlassInput
+                  icon={Calendar}
+                  label="Payment Date"
+                  name="paymentDate"
+                  type="date"
+                  value={paymentForm.paymentDate}
+                  onChange={handlePaymentFormChange}
+                  required
+                />
+
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-gray-700">Notes</label>
+                  <textarea
+                    name="notes"
+                    value={paymentForm.notes}
+                    onChange={handlePaymentFormChange}
+                    placeholder="Payment notes (optional)"
+                    rows="3"
+                    className="w-full px-4 py-3 input-glass rounded-xl border border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/80"
+                  />
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4">
+                  <GlassButton
+                    type="button"
+                    onClick={() => {
+                      setShowPaymentModal(false);
+                      setSelectedVisit(null);
+                      setPaymentForm({
+                        amountPaid: '',
+                        paymentMethod: 'cash',
+                        paymentDate: new Date().toISOString().split('T')[0],
+                        notes: ''
+                      });
+                    }}
+                    variant="secondary"
+                    className="bg-gray-500 text-white"
+                  >
+                    Cancel
+                  </GlassButton>
+                  <GlassButton
+                    type="submit"
+                    variant="success"
+                    loading={isLoading}
+                    className="bg-green-500 text-white"
+                  >
+                    <Save size={18} />
+                    Record Payment
+                  </GlassButton>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
+     
     </div>
   );
 };
@@ -525,6 +790,7 @@ const PatientForm = ({ formData, handleChange, onSubmit, submitText, icon, isLoa
           onChange={handleChange}
           placeholder="Emergency contact phone"
         />
+
       </div>
 
       <div className="flex justify-end pt-4">
