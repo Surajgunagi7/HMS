@@ -12,6 +12,24 @@ const createAppointment = asyncHandler(async (req, res) => {
   if (!patient || !doctor || !dateTime) {
     throw new ApiError(400, "Patient, doctor, and dateTime are required");
   }
+  
+  const appointmentDateTime = new Date(dateTime);
+
+  const oneHourBefore = new Date(appointmentDateTime.getTime() - 60 * 60 * 1000);
+  const oneHourAfter = new Date(appointmentDateTime.getTime() + 60 * 60 * 1000);
+
+  const existingAppointment = await Appointment.findOne({
+    doctor,
+    dateTime: {
+      $gte: oneHourBefore,
+      $lte: oneHourAfter, 
+    },
+    status: "confirmed"
+  });
+
+  if (existingAppointment) {
+    throw new ApiError(409, "The doctor already has a confirmed appointment within 1 hour of this time. Please choose another slot.");
+  }
 
   const appointment = await Appointment.create({
     patient,
@@ -19,21 +37,32 @@ const createAppointment = asyncHandler(async (req, res) => {
     dateTime,
     reason,
   });
-    const patientDetails = await Patient.findById(patient);
-    const doctorDetails = await User.findById(doctor);  
-    if (patientDetails?.email) {
-      const formattedDate = new Date(dateTime).toLocaleString();
 
-      await sendMail({
-        to: patientDetails.email,
-        subject: 'Appointment Created (Pending Confirmation)',
-        html: `
-          <p>Dear ${patientDetails.name},</p>
-          <p>Your appointment with <strong>Dr. ${doctorDetails.name}</strong> on <strong>${formattedDate}</strong> has been <strong>${appointment.status}</strong>.</p>
-          <p>We will notify you once the status is updated.</p>
-        `
+  const patientDetails = await Patient.findById(patient);
+  const doctorDetails = await User.findById(doctor);  
+  
+  if (patientDetails?.email) {
+    
+    const formattedDate = new Date(dateTime).toLocaleString('en-US', { 
+      timeZone: 'UTC',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    await sendMail({
+      to: patientDetails.email,
+      subject: 'Appointment Created (Pending Confirmation)',
+      html: `
+        <p>Dear ${patientDetails.name},</p>
+        <p>Your appointment with <strong>Dr. ${doctorDetails.name}</strong> on <strong>${formattedDate}</strong> has been <strong>${appointment.status}</strong>.</p>
+        <p>We will notify you once the status is updated.</p>
+      `
     });
   }
+  
   return res
     .status(201)
     .json(new ApiResponse(201, appointment, "Appointment created successfully"));
@@ -92,7 +121,15 @@ const updateAppointment = asyncHandler(async (req, res) => {
     const doctorDetails = await User.findById(appointment.doctor);
 
     if (patientDetails?.email) {
-      const formattedDate = new Date(appointment.dateTime).toLocaleString();
+      const formattedDate = new Date(appointment.dateTime).toLocaleString('en-US', { 
+        timeZone: 'UTC',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
       const isConfirmed = status === 'confirmed';
 
       await sendMail({
