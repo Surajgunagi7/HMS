@@ -22,6 +22,7 @@ const UpdateDoctor = () => {
   const [doctorDetails, setDoctorDetails] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [profilePicture, setProfilePicture] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const dispatch = useDispatch();

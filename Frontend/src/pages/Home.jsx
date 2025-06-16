@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import {  
   Award, 
-  Star,
   ArrowRight,
   Calendar,
   Stethoscope,
@@ -90,30 +89,6 @@ const Home = () => {
     }
   ];
 
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Patient",
-      comment: "The care I received was exceptional. The doctors were thorough and the staff was incredibly supportive throughout my treatment.",
-      rating: 5,
-      image: "https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=400"
-    },
-    {
-      name: "Michael Chen",
-      role: "Patient",
-      comment: "Quick appointment booking and professional service. The liquid glass interface makes everything so smooth and modern.",
-      rating: 5,
-      image: "https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=400"
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Patient",
-      comment: "Outstanding medical care with a personal touch. The doctors really listen and provide comprehensive treatment plans.",
-      rating: 5,
-      image: "https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=400"
-    }
-  ];
-
   return (
     <div className="overflow-hidden">
       {/* Hero Section */}
@@ -141,7 +116,7 @@ const Home = () => {
               </h1>
               <p className="text-xl text-gray-600 leading-relaxed">
                 Experience world-class healthcare with our team of expert doctors and 
-                state-of-the-art facilities. We're here for you 24/7 with personalized care.
+                state-of-the-art facilities. We&apos;re here for you 24/7 with personalized care.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
@@ -163,7 +138,7 @@ const Home = () => {
             <div className="relative">
               <div className="relative">
                 <img
-                  src="https://images.pexels.com/photos/305568/pexels-photo-305568.jpeg?auto=compress&cs=tinysrgb&w=800"
+                  src="/images/LandingIMG.webp"
                   alt="Hospital"
                   className="rounded-3xl shadow-2xl"
                 />
@@ -274,67 +249,6 @@ const Home = () => {
                     <span>View Doctors</span>
                     <ArrowRight className="h-4 w-4 ml-1 smooth-transition group-hover:translate-x-1" />
                   </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0">
-          <div className="absolute top-20 right-20 w-64 h-64 bg-blue-400/10 rounded-full blur-2xl animate-float"></div>
-          <div className="absolute bottom-20 left-20 w-64 h-64 bg-cyan-400/10 rounded-full blur-2xl animate-float-delayed"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center px-4 py-2 liquid-glass-blue rounded-full text-sm font-medium mb-6 text-blue-700">
-              <Star className="h-4 w-4 mr-2 text-yellow-500" />
-              Patient Testimonials
-            </div>
-            <h2 className="text-3xl md:text-5xl font-bold text-gray-900 mb-4">
-              What Our Patients
-              <span className="gradient-text block">
-                Say About Us
-              </span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Don't just take our word for it. Here's what our patients have to say about their experience with us.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={index}
-                className="group card-liquid"
-              >
-                <div className="liquid-glass-blue rounded-2xl p-8 h-full smooth-hover">
-                  <div className="flex items-center mb-6">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 mb-6 italic leading-relaxed">
-                    "{testimonial.comment}"
-                  </p>
-                  <div className="flex items-center">
-                    <div className="relative">
-                      <img
-                        src={testimonial.image}
-                        alt={testimonial.name}
-                        className="h-14 w-14 rounded-full object-cover mr-4 ring-2 ring-white/50"
-                      />
-                      <div className="absolute -bottom-1 -right-1 bg-green-500 w-4 h-4 rounded-full border-2 border-white"></div>
-                    </div>
-                    <div>
-                      <p className="font-bold text-gray-900">{testimonial.name}</p>
-                      <p className="text-sm text-gray-600">{testimonial.role}</p>
-                    </div>
-                  </div>
                 </div>
               </div>
             ))}

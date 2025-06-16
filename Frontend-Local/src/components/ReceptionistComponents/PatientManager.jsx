@@ -213,10 +213,8 @@ const PatientManager = () => {
       console.log("Payment response:", response);
       
       if (response?.data) {
-        // Refresh pending payments
         await fetchPendingPayments(patient._id);
         
-        // Reset form and close modal
         setPaymentForm({
           amountPaid: '',
           paymentMethod: 'cash',

@@ -39,17 +39,6 @@ class AuthService {
       throw error;
     }
   }
-  
-  // Use of these methods will be done after the backend
-  isAuthenticated() {
-    const token = localStorage.getItem('token');
-    return !!token; 
-  }
-
-  getAuthHeader() {
-    const token = localStorage.getItem('token');
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  }
 }
 
 export const authService = new AuthService();

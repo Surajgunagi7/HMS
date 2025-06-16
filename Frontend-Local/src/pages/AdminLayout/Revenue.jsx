@@ -62,6 +62,7 @@ const Revenue = () => {
     
     const emergencyRevenue = revenueData.revenueByVisitType?.find(item => item._id === 'emergency')?.revenue || 0;
     const appointmentRevenue = revenueData.revenueByVisitType?.find(item => item._id === 'appointment')?.revenue || 0;
+    // eslint-disable-next-line no-unused-vars
     const walkinRevenue = revenueData.revenueByVisitType?.find(item => item._id === 'walk-in')?.revenue || 0;
 
     const pendingPayments = revenueData.paymentStatusDistribution?.find(item => item._id === 'pending')?.totalAmount || 0;

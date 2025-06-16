@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Clock, Check, X, User, Calendar, Filter } from "lucide-react";
+import { Search, Clock, Check, X, User, Calendar } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { updateAppointmentStatus } from "../../store/appointmentSlice";
 import { appointmentService } from "../../services/appointmentsService";

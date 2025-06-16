@@ -64,7 +64,7 @@ const Footer = () => {
             <ul className="space-y-3">
               <li className="flex items-center space-x-2">
                 <Phone className="h-4 w-4 text-primary-400" />
-                <span className="text-gray-300">+1 (555) 123-4567</span>
+                <span className="text-gray-300">+91 7894562531</span>
               </li>
               <li className="flex items-center space-x-2">
                 <Mail className="h-4 w-4 text-primary-400" />
@@ -73,8 +73,8 @@ const Footer = () => {
               <li className="flex items-start space-x-2">
                 <MapPin className="h-4 w-4 text-primary-400 mt-1" />
                 <span className="text-gray-300">
-                  123 Healthcare Ave<br />
-                  Medical District, NY 10001
+                  HBR Layout, Bangaluru-Mangalore Road<br />
+                  Karnataka, 573201
                 </span>
               </li>
             </ul>

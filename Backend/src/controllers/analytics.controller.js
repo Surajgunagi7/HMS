@@ -27,7 +27,6 @@ const getDashboardStats = asyncHandler(async (req, res) => {
       status: "pending"
     });
 
-    // Get this month's revenue
     const currentMonth = new Date();
     currentMonth.setDate(1);
     currentMonth.setHours(0, 0, 0, 0);
@@ -50,7 +49,6 @@ const getDashboardStats = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Get new patients this month
     const newPatientsThisMonth = await Patient.countDocuments({
       createdAt: { $gte: currentMonth }
     });
@@ -73,7 +71,6 @@ const getDashboardStats = asyncHandler(async (req, res) => {
 
 const getAppointmentAnalytics = asyncHandler(async (req, res) => {
   try {
-    // Appointment status distribution
     const statusDistribution = await Appointment.aggregate([
       {
         $group: {
@@ -83,7 +80,6 @@ const getAppointmentAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Monthly appointment trends (last 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -107,7 +103,6 @@ const getAppointmentAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Daily appointments for current week
     const weekStart = new Date();
     weekStart.setDate(weekStart.getDate() - weekStart.getDay());
     weekStart.setHours(0, 0, 0, 0);
@@ -137,7 +132,6 @@ const getAppointmentAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Top doctors by appointments
     const topDoctors = await Appointment.aggregate([
       {
         $group: {
@@ -186,7 +180,6 @@ const getAppointmentAnalytics = asyncHandler(async (req, res) => {
 
 const getPatientAnalytics = asyncHandler(async (req, res) => {
   try {
-    // Age group distribution
     const ageDistribution = await Patient.aggregate([
       {
         $match: { age: { $exists: true, $ne: null } }
@@ -203,7 +196,6 @@ const getPatientAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Gender distribution
     const genderDistribution = await Patient.aggregate([
       {
         $group: {
@@ -213,7 +205,6 @@ const getPatientAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Patient registration trends (last 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -237,13 +228,11 @@ const getPatientAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Top patients by visits
     const topPatients = await Patient.find()
       .sort({ totalVisits: -1 })
       .limit(10)
       .select('name totalVisits totalRevenue lastVisit');
 
-    // Visit type distribution
     const visitTypeDistribution = await Patient.aggregate([
       {
         $unwind: "$visits"
@@ -272,7 +261,6 @@ const getPatientAnalytics = asyncHandler(async (req, res) => {
 
 const getRevenueAnalytics = asyncHandler(async (req, res) => {
   try {
-    // Monthly revenue for last 12 months
     const twelveMonthsAgo = new Date();
     twelveMonthsAgo.setMonth(twelveMonthsAgo.getMonth() - 12);
 
@@ -301,7 +289,6 @@ const getRevenueAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Revenue by visit type
     const revenueByVisitType = await Patient.aggregate([
       {
         $unwind: "$visits"
@@ -320,7 +307,6 @@ const getRevenueAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Payment status distribution
     const paymentStatusDistribution = await Patient.aggregate([
       {
         $unwind: "$visits"
@@ -334,13 +320,11 @@ const getRevenueAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Top revenue generating patients
     const topRevenuePatients = await Patient.find()
       .sort({ totalRevenue: -1 })
       .limit(10)
       .select('name totalRevenue totalVisits');
 
-    // Daily revenue for current month
     const currentMonth = new Date();
     currentMonth.setDate(1);
     currentMonth.setHours(0, 0, 0, 0);
@@ -388,7 +372,6 @@ const getRevenueAnalytics = asyncHandler(async (req, res) => {
 
 const getDoctorAnalytics = asyncHandler(async (req, res) => {
   try {
-    // Doctor availability status
     const availabilityStatus = await User.aggregate([
       {
         $match: { role: "doctor" }
@@ -401,7 +384,6 @@ const getDoctorAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Doctors by specialization
     const specializationDistribution = await User.aggregate([
       {
         $match: { 
@@ -417,7 +399,6 @@ const getDoctorAnalytics = asyncHandler(async (req, res) => {
       }
     ]);
 
-    // Doctor performance (appointments + consultation fees)
     const doctorPerformance = await User.aggregate([
       {
         $match: { role: "doctor" }
@@ -479,7 +460,6 @@ const getDoctorAnalytics = asyncHandler(async (req, res) => {
 
 const getComprehensiveAnalytics = asyncHandler(async (req, res) => {
   try {
-    // Execute multiple analytics in parallel
     const [
       dashboardStats,
       appointmentAnalytics,
@@ -681,7 +661,6 @@ const getPatientAnalyticsData = async () => {
       }
     ]);
 
-    // Gender distribution
     const genderDistribution = await Patient.aggregate([
       {
         $group: {
@@ -691,7 +670,6 @@ const getPatientAnalyticsData = async () => {
       }
     ]);
 
-    // Patient registration trends (last 6 months)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
@@ -715,13 +693,11 @@ const getPatientAnalyticsData = async () => {
       }
     ]);
 
-    // Top patients by visits
     const topPatients = await Patient.find()
       .sort({ totalVisits: -1 })
       .limit(10)
       .select('name totalVisits totalRevenue lastVisit');
 
-    // Visit type distribution
     const visitTypeDistribution = await Patient.aggregate([
       {
         $unwind: "$visits"
@@ -772,7 +748,6 @@ const getRevenueAnalyticsData = async () => {
       }
     ]);
 
-    // Revenue by visit type
     const revenueByVisitType = await Patient.aggregate([
       {
         $unwind: "$visits"
@@ -791,7 +766,6 @@ const getRevenueAnalyticsData = async () => {
       }
     ]);
 
-    // Payment status distribution
     const paymentStatusDistribution = await Patient.aggregate([
       {
         $unwind: "$visits"
@@ -805,13 +779,11 @@ const getRevenueAnalyticsData = async () => {
       }
     ]);
 
-    // Top revenue generating patients
     const topRevenuePatients = await Patient.find()
       .sort({ totalRevenue: -1 })
       .limit(10)
       .select('name totalRevenue totalVisits');
 
-    // Daily revenue for current month
     const currentMonth = new Date();
     currentMonth.setDate(1);
     currentMonth.setHours(0, 0, 0, 0);
@@ -865,7 +837,6 @@ const getDoctorAnalyticsData = async () => {
       }
     ]);
 
-    // Doctors by specialization
     const specializationDistribution = await User.aggregate([
       {
         $match: { 
@@ -881,7 +852,6 @@ const getDoctorAnalyticsData = async () => {
       }
     ]);
 
-    // Doctor performance (appointments + consultation fees)
     const doctorPerformance = await User.aggregate([
       {
         $match: { role: "doctor" }

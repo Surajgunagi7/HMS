@@ -2,7 +2,7 @@ import { asyncHandler } from '../utils/AsyncHandler.js'
 import { ApiError }  from '../utils/ApiError.js'
 import {ApiResponse} from '../utils/ApiResponse.js'
 import Patient from '../models/patient.model.js'
-
+import { sendMail } from '../utils/sendMail.js'
 
 const createOrFindPatient = asyncHandler(async (req, res) => {
   const {
@@ -39,6 +39,28 @@ const createOrFindPatient = asyncHandler(async (req, res) => {
     medicalHistory,
     emergencyContact,
   });
+
+  if (patient?.email) {
+    await sendMail({
+      to: patient.email,
+      subject: 'Welcome to Our Hospital',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 1rem; color: #333;">
+          <h2>Patient Registration Successful</h2>
+          <p>Dear ${patient.name},</p>
+
+          <p>We’re happy to inform you that your profile has been successfully created in our hospital system.</p>
+
+          <p>Your patient ID is: <strong>${patient.patientId}</strong></p>
+
+          <p>You can now book appointments and receive medical care through our system.</p>
+
+          <p style="margin-top: 2rem;">Warm regards,<br/>Hospital Administration Team</p>
+        </div>
+      `
+    });
+  }
+
 
   res.status(201).json(
     new ApiResponse(201, {
@@ -146,7 +168,6 @@ const addVisitToPatient = asyncHandler(async (req, res) => {
   );
 });
 
-// New method to get patient visits with payment details
 const getPatientVisits = asyncHandler(async (req, res) => {
   const { patientId } = req.params;
 
@@ -170,7 +191,6 @@ const getPatientVisits = asyncHandler(async (req, res) => {
   );
 });
 
-// New method to update visit payment
 const updateVisitPayment = asyncHandler(async (req, res) => {
   const { patientId, visitId } = req.params;
   const { amountPaid, paymentMethod, paymentDate, notes } = req.body;
@@ -187,13 +207,11 @@ const updateVisitPayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Visit not found");
   }
 
-  // Update payment details
   visit.amountPaid = amountPaid || visit.amountPaid;
   visit.paymentMethod = paymentMethod || visit.paymentMethod;
   visit.paymentDate = paymentDate || visit.paymentDate;
   visit.notes = notes || visit.notes;
 
-  // Calculate pending amount
   visit.pendingAmount = visit.amount - visit.amountPaid;
   visit.paymentStatus = visit.pendingAmount <= 0 ? 'completed' : 'partial';
 
@@ -207,7 +225,6 @@ const updateVisitPayment = asyncHandler(async (req, res) => {
   );
 });
 
-// New method to get pending payments for a patient
 const getPendingPayments = asyncHandler(async (req, res) => {
   const { patientId } = req.params;
 
@@ -217,7 +234,6 @@ const getPendingPayments = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Patient not found");
   }
 
-  // Filter visits with pending payments
   const pendingVisits = patient.visits.filter(visit => 
     visit.paymentStatus === 'pending' || visit.paymentStatus === 'partial'
   );
@@ -241,7 +257,6 @@ const getPendingPayments = asyncHandler(async (req, res) => {
   );
 });
 
-// New method to record payment for pending amount
 const recordPayment = asyncHandler(async (req, res) => {
   const { patientId, visitId } = req.params;
   const { amountPaid, paymentMethod, paymentDate, notes } = req.body;
@@ -262,7 +277,6 @@ const recordPayment = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Visit not found");
   }
 
-  // Calculate new amounts
   const currentPaid = visit.amountPaid || 0;
   const newAmountPaid = currentPaid + parseFloat(amountPaid);
   
@@ -270,14 +284,12 @@ const recordPayment = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Payment amount exceeds the total visit amount");
   }
 
-  // Update payment details
   visit.amountPaid = newAmountPaid;
   visit.pendingAmount = visit.amount - newAmountPaid;
   visit.paymentMethod = paymentMethod || visit.paymentMethod;
   visit.paymentDate = paymentDate || new Date();
   visit.notes = notes || visit.notes;
 
-  // Update payment status
   if (visit.pendingAmount <= 0) {
     visit.paymentStatus = 'paid';
   } else if (visit.amountPaid > 0) {

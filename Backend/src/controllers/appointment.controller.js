@@ -2,6 +2,9 @@ import {asyncHandler} from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import Appointment from "../models/appointment.model.js";
+import { sendMail } from "../utils/sendMail.js";
+import Patient from "../models/patient.model.js";
+import  { User } from  '../models/user.model.js'
 
 const createAppointment = asyncHandler(async (req, res) => {
   const { patient, doctor, dateTime, reason } = req.body;
@@ -16,7 +19,21 @@ const createAppointment = asyncHandler(async (req, res) => {
     dateTime,
     reason,
   });
+    const patientDetails = await Patient.findById(patient);
+    const doctorDetails = await User.findById(doctor);  
+    if (patientDetails?.email) {
+      const formattedDate = new Date(dateTime).toLocaleString();
 
+      await sendMail({
+        to: patientDetails.email,
+        subject: 'Appointment Created (Pending Confirmation)',
+        html: `
+          <p>Dear ${patientDetails.name},</p>
+          <p>Your appointment with <strong>Dr. ${doctorDetails.name}</strong> on <strong>${formattedDate}</strong> has been <strong>${appointment.status}</strong>.</p>
+          <p>We will notify you once the status is updated.</p>
+        `
+    });
+  }
   return res
     .status(201)
     .json(new ApiResponse(201, appointment, "Appointment created successfully"));
@@ -70,10 +87,35 @@ const updateAppointment = asyncHandler(async (req, res) => {
 
   await appointment.save();
 
+  if (status === 'confirmed' || status === 'cancelled') {
+    const patientDetails = await Patient.findById(appointment.patient);
+    const doctorDetails = await User.findById(appointment.doctor);
+
+    if (patientDetails?.email) {
+      const formattedDate = new Date(appointment.dateTime).toLocaleString();
+      const isConfirmed = status === 'confirmed';
+
+      await sendMail({
+        to: patientDetails.email,
+        subject: `Appointment ${status.charAt(0).toUpperCase() + status.slice(1)}`,
+        html: `
+          <p>Dear ${patientDetails.name},</p>
+          <p>Your appointment with <strong>Dr. ${doctorDetails.name}</strong> on <strong>${formattedDate}</strong> has been <strong>${status}</strong>.</p>
+          ${
+            isConfirmed
+              ? `<p>We look forward to seeing you. Please arrive on time.</p>`
+              : `<p>We regret to inform you that the appointment was cancelled. You can rebook a slot anytime.</p>`
+          }
+        `
+      });
+    }
+  }
+
   return res
     .status(200)
     .json(new ApiResponse(200, appointment, "Appointment updated successfully"));
 });
+
 
 export {
   createAppointment,

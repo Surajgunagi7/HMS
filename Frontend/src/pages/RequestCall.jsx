@@ -266,13 +266,13 @@ const RequestCall = () => {
                         href="tel:911"
                         className="block w-full bg-gradient-to-r from-red-600 to-red-700 text-white text-center py-3 rounded-xl hover:from-red-700 hover:to-red-800 smooth-transition font-semibold mb-3"
                       >
-                        Call 911 Now
+                        Call 112 (or 100) Now
                       </a>
                       <a
                         href="tel:+1234567890"
                         className="block w-full liquid-glass border border-red-300 text-red-700 text-center py-3 rounded-xl hover:bg-red-50/50 smooth-transition font-semibold"
                       >
-                        Hospital Emergency: +1 (555) 123-4567
+                        Hospital Emergency: +91 8945647521
                       </a>
                     </div>
 
@@ -284,7 +284,7 @@ const RequestCall = () => {
                           <Phone className="h-5 w-5 text-blue-500" />
                           <div>
                             <p className="font-medium text-gray-900">Direct Call</p>
-                            <p className="text-sm text-gray-600">+1 (555) 123-4567</p>
+                            <p className="text-sm text-gray-600">+91 7894562531</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">

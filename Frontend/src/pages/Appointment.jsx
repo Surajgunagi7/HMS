@@ -398,7 +398,7 @@ const Appointment = () => {
                           <Phone className="h-5 w-5 text-blue-500" />
                           <div>
                             <p className="font-medium text-gray-900">Call Us</p>
-                            <p className="text-sm text-gray-600">+1 (555) 123-4567</p>
+                            <p className="text-sm text-gray-600">+91 7894562531</p>
                           </div>
                         </div>
                         <div className="flex items-center space-x-3">

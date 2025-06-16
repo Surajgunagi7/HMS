@@ -114,7 +114,7 @@ const Header = () => {
             </Link>
           ))}
           <a
-            href="tel:+1234567890"
+            href="tel:+917894562531"
             className="btn-liquid text-white px-4 py-2 rounded-xl flex items-center space-x-2 w-fit"
           >
             <Phone className="h-4 w-4" />

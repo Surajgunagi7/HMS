@@ -5,6 +5,8 @@ import  { User } from  '../models/user.model.js'
 import jwt from 'jsonwebtoken'
 import crypto from 'crypto';
 import {uploadOnCloudinary} from '../utils/cloudinary.js'
+import {sendMail} from '../utils/sendMail.js'
+
 const generateAccessAndRefreshTokens = async(userId) => {
     try {
         const user = await User.findById(userId)
@@ -93,6 +95,34 @@ const registerUser = asyncHandler( async (req, res) => {
     const createdUser = await User.findById(user._id).select(
         "-password -refreshToken"
     )
+
+    if (createdUser?.email) {
+        await sendMail({
+            to: createdUser.email,
+            subject: `Your Hospital Management System Account is Ready`,
+            html: `
+            <div style="font-family: Arial, sans-serif; padding: 1rem; color: #333;">
+                <h2>Welcome to the Hospital Management System</h2>
+                <p>Dear ${createdUser.name},</p>
+
+                <p>Your account has been successfully created with the role of <strong>${createdUser.role}</strong>.</p>
+
+                <p>Please find your login credentials below:</p>
+
+                <ul style="line-height: 1.6;">
+                <li><strong>Login ID:</strong> ${createdUser.loginId}</li>
+                <li><strong>Password:</strong> ${password}</li>
+                </ul>
+
+                <p>You can now access the system using the above credentials.</p>
+
+                <p style="margin-top: 2rem;">Regards,<br/>Hospital Administration Team</p>
+            </div>
+            `
+        });
+    }
+
+
     if(!createdUser) throw new ApiError(500, "Something went wrong registering user");
 
     return res.status(201).json(
@@ -312,18 +342,15 @@ const updateDoctorWithImage = asyncHandler(async (req, res) => {
     try {
         const { _id, name, email, role, phone, specialization, consultationFee, about } = req.body;
         
-        // Validate required fields
         if (!_id) {
             throw new ApiError(400, "Doctor ID is required");
         }
 
-        // Find the doctor
         const doctor = await User.findById(_id);
         if (!doctor) {
             throw new ApiError(404, "Doctor not found");
         }
 
-        // Parse the about field if it's a string (from FormData)
         let parsedAbout = about;
         if (typeof about === 'string') {
             try {
@@ -392,10 +419,6 @@ const updateDoctorWithImage = asyncHandler(async (req, res) => {
     }
 });
 
-/* TODO
-forgotPassword
-resetPassword
-*/
 export {
     registerUser,
     loginUser,
