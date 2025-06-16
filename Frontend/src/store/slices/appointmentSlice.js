@@ -1,5 +1,22 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {service} from '../../service/apiCallService.js'
+
+const extractErrorMessage = (htmlString) => {
+  if (typeof htmlString !== 'string') return null;
+  
+  const preMatch = htmlString.match(/<pre>Error: ([^<]+)<br>/);
+  if (preMatch && preMatch[1]) {
+    return preMatch[1].trim();
+  }
+  
+  const errorMatch = htmlString.match(/Error: ([^<\n]+)/);
+  if (errorMatch && errorMatch[1]) {
+    return errorMatch[1].trim();
+  }
+  
+  return null;
+}
+
 export const bookAppointment = createAsyncThunk(
   'appointments/bookAppointment',
   async (appointmentData, { rejectWithValue }) => {
@@ -24,13 +41,30 @@ export const bookAppointment = createAsyncThunk(
       console.log('Booking appointment with data:', response.data);
       
       return {
-        id: Date.now(),
         ...appointmentData,
+        ...response.data.data,
         status: 'confirmed',
         createdAt: new Date().toISOString()
       };
     } catch (error) {
-      return rejectWithValue(error.message);
+      if (error.response?.data) {
+        if (error.response.data.message) {
+          return rejectWithValue(error.response.data.message);
+        }
+        
+        if (typeof error.response.data === 'string') {
+          const extractedMessage = extractErrorMessage(error.response.data);
+          if (extractedMessage) {
+            return rejectWithValue(extractedMessage);
+          }
+        }
+        
+        if (typeof error.response.data === 'object') {
+          return rejectWithValue(error.response.data.error || 'An error occurred');
+        }
+      }
+      
+      return rejectWithValue(error.message || 'Something went wrong');
     }
   }
 );
