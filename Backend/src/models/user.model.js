@@ -48,7 +48,6 @@ const userSchema = new Schema(
         },
         profilePicture: {
             type: String,
-            default: "https://res.cloudinary.com/dl96cbqkg/image/upload/v1749824775/default_lkmhfk.jpg"
         },
         consultationFee: {
             type: Number,

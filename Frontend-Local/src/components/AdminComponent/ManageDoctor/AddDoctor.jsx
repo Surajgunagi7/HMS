@@ -43,7 +43,8 @@ const AddDoctor = () => {
 
       if (profilePicture) {
         formData.append("profilePicture", profilePicture);
-      }
+      } else 
+        formData.append("profilePicture", 'http://localhost:5173/images/patient.png')
 
       const response = await doctorService.addDoctor(formData);
 
